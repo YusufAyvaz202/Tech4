@@ -2,8 +2,13 @@ import 'package:flutter/material.dart';
 
 class MazeGridBoard extends StatelessWidget {
   final List<List<int>> maze;
+  final List<List<int>> hintPath; // Yeni: İpucu listesini dışarıdan alıyoruz
 
-  const MazeGridBoard({Key? key, required this.maze}) : super(key: key);
+  const MazeGridBoard({
+    Key? key, 
+    required this.maze,
+    required this.hintPath, // Constructor'a eklendi
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -22,6 +27,9 @@ class MazeGridBoard extends StatelessWidget {
             int col = index % maze[0].length;
             int cellValue = maze[row][col];
 
+            // Yeni: Bu kare ipucu listesinde var mı diye kontrol ediyoruz
+            bool isHint = hintPath.any((pos) => pos[0] == row && pos[1] == col);
+
             Color cellColor;
             if (cellValue == 1) {
               cellColor = Colors.black87;
@@ -29,6 +37,8 @@ class MazeGridBoard extends StatelessWidget {
               cellColor = Colors.green; 
             } else if (cellValue == 3) {
               cellColor = Colors.red; 
+            } else if (isHint) {
+              cellColor = Colors.amber.shade300; // Yeni: İpucu karesinin rengi (Sarı)
             } else {
               cellColor = Colors.white;
             }

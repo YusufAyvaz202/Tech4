@@ -34,15 +34,26 @@ class _MazeEscapeScreenState extends State<MazeEscapeScreen> {
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
-        title: const Text('Bölüm Tamamlandı!'),
-        content: const Text('Harika iş çıkardın. Sıradaki labirente geçiliyor...'),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)), // Şık köşeler
+        title: Row(
+          children: const [
+            Icon(Icons.emoji_events, color: Colors.amber, size: 32),
+            SizedBox(width: 8),
+            Text('Tebrikler!'),
+          ],
+        ),
+        // Adım sayısını bildirimin içine ekledik
+        content: Text(
+          'Labirenti ${_controller.currentSteps} adımda başarıyla tamamladın!',
+          style: const TextStyle(fontSize: 16),
+        ),
         actions: [
           TextButton(
             onPressed: () {
               Navigator.of(context).pop(); 
-              _controller.loadNextMaze(); // Tamam'a basınca resetGame DEĞİL, sonraki labirenti yükle
+              _controller.loadNextMaze(); 
             },
-            child: const Text('Sonraki Bölüm'),
+            child: const Text('Sonraki Bölüm', style: TextStyle(fontSize: 16)),
           ),
         ],
       ),
@@ -56,7 +67,6 @@ class _MazeEscapeScreenState extends State<MazeEscapeScreen> {
         title: const Text('Labirent Kaçış'),
         backgroundColor: Colors.blueGrey,
         actions: [
-          // Sağ üst köşedeki yuvarlak yenileme/değiştirme butonu
           IconButton(
             icon: const Icon(Icons.refresh, color: Colors.white),
             tooltip: 'Farklı Labirent Yükle',
@@ -64,7 +74,7 @@ class _MazeEscapeScreenState extends State<MazeEscapeScreen> {
               _controller.loadNextMaze();
             },
           ),
-          const SizedBox(width: 8), // Sağdan hafif boşluk
+          const SizedBox(width: 8),
         ],
       ),
       body: ListenableBuilder(
@@ -72,18 +82,31 @@ class _MazeEscapeScreenState extends State<MazeEscapeScreen> {
         builder: (context, child) {
           return Column(
             children: [
-              // Hangi seviyede olduğumuzu gösteren küçük bir bilgi yazısı
+              // Üst bilgi paneli: Seviye ve Adım Sayacı
               Padding(
-                padding: const EdgeInsets.only(top: 16.0),
-                child: Text(
-                  'Seviye ${_controller.currentMazeIndex + 1}',
-                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.blueGrey),
+                padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Seviye ${_controller.currentMazeIndex + 1}',
+                      style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.blueGrey),
+                    ),
+                    Text(
+                      'Adım: ${_controller.currentSteps}',
+                      style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.deepPurple),
+                    ),
+                  ],
                 ),
               ),
               
               Expanded(
                 child: Center(
-                  child: MazeGridBoard(maze: _controller.maze),
+                  // Hint listesini board'a gönderiyoruz
+                  child: MazeGridBoard(
+                    maze: _controller.maze, 
+                    hintPath: _controller.hintPath,
+                  ),
                 ),
               ),
               
@@ -99,18 +122,22 @@ class _MazeEscapeScreenState extends State<MazeEscapeScreen> {
                 child: SizedBox(
                   width: double.infinity,
                   height: 50,
-                  child: ElevatedButton(
+                  child: ElevatedButton.icon(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.deepPurple,
                       foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     ),
-                    onPressed: () {
-                      print("A* Algoritması başlatılıyor...");
-                    },
-                    child: const Text(
-                      'Bana Yolu Göster',
+                    // "Yolu Göster" yerine "İpucu Ver" ikonlu buton
+                    icon: const Icon(Icons.lightbulb_outline),
+                    label: const Text(
+                      'İpucu Ver',
                       style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     ),
+                    onPressed: () {
+                      print("A* Algoritması başlatılıyor ve ilk 3 adım sarıya boyanacak...");
+                      // TODO: A* fonksiyonu çağrılıp dönen sonucun ilk 3'ü hintPath'e eklenecek
+                    },
                   ),
                 ),
               )

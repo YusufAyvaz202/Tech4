@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../data/maze_levels.dart'; // Yeni veri sınıfımızı dahil ettik
+import '../data/maze_levels.dart'; 
 
 class MazeGameController extends ChangeNotifier {
   int playerRow = 0;
@@ -7,16 +7,20 @@ class MazeGameController extends ChangeNotifier {
   bool isGameWon = false;
   
   int currentMazeIndex = 0; 
+  int currentSteps = 0; // Yeni: Adım sayacı
+
   List<List<int>> maze = [];
+  List<List<int>> hintPath = []; // Yeni: İpucu koordinatlarını tutacak liste [[satir, sutun], [satir, sutun]]
 
   MazeGameController() {
     resetGame();
   }
 
   void resetGame() {
-    // Haritaları artık MazeLevels sınıfından çekiyoruz
     maze = MazeLevels.levels[currentMazeIndex].map((row) => List<int>.from(row)).toList();
     isGameWon = false;
+    currentSteps = 0;    // Yeni: Bölüm başında adımı sıfırla
+    hintPath.clear();    // Yeni: Bölüm başında ipuçlarını temizle
     _findPlayerStartPosition();
     notifyListeners();
   }
@@ -55,6 +59,9 @@ class MazeGameController extends ChangeNotifier {
     playerRow = newRow;             
     playerCol = newCol;
     maze[playerRow][playerCol] = 2; 
+    
+    currentSteps++; // Yeni: Karakter her başarılı hareketinde adımı 1 artır
+    hintPath.clear(); // Yeni: Oyuncu hareket ettiğinde eski ipucunu ekrandan sil
 
     notifyListeners(); 
   }
