@@ -34,7 +34,7 @@ class _MazeEscapeScreenState extends State<MazeEscapeScreen> {
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)), // Şık köşeler
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)), 
         title: Row(
           children: const [
             Icon(Icons.emoji_events, color: Colors.amber, size: 32),
@@ -42,7 +42,6 @@ class _MazeEscapeScreenState extends State<MazeEscapeScreen> {
             Text('Tebrikler!'),
           ],
         ),
-        // Adım sayısını bildirimin içine ekledik
         content: Text(
           'Labirenti ${_controller.currentSteps} adımda başarıyla tamamladın!',
           style: const TextStyle(fontSize: 16),
@@ -82,7 +81,6 @@ class _MazeEscapeScreenState extends State<MazeEscapeScreen> {
         builder: (context, child) {
           return Column(
             children: [
-              // Üst bilgi paneli: Seviye ve Adım Sayacı
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
                 child: Row(
@@ -102,7 +100,6 @@ class _MazeEscapeScreenState extends State<MazeEscapeScreen> {
               
               Expanded(
                 child: Center(
-                  // Hint listesini board'a gönderiyoruz
                   child: MazeGridBoard(
                     maze: _controller.maze, 
                     hintPath: _controller.hintPath,
@@ -128,15 +125,13 @@ class _MazeEscapeScreenState extends State<MazeEscapeScreen> {
                       foregroundColor: Colors.white,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     ),
-                    // "Yolu Göster" yerine "İpucu Ver" ikonlu buton
                     icon: const Icon(Icons.lightbulb_outline),
                     label: const Text(
                       'İpucu Ver',
                       style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     ),
                     onPressed: () {
-                      print("A* Algoritması başlatılıyor ve ilk 3 adım sarıya boyanacak...");
-                      // TODO: A* fonksiyonu çağrılıp dönen sonucun ilk 3'ü hintPath'e eklenecek
+                      _controller.getHint(); 
                     },
                   ),
                 ),

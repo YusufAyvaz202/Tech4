@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../data/maze_levels.dart'; 
+import '../ai/a_star_pathfinder.dart'; // AI dosyamızı içeri aktardık
 
 class MazeGameController extends ChangeNotifier {
   int playerRow = 0;
@@ -7,10 +8,10 @@ class MazeGameController extends ChangeNotifier {
   bool isGameWon = false;
   
   int currentMazeIndex = 0; 
-  int currentSteps = 0; // Yeni: Adım sayacı
+  int currentSteps = 0; 
 
   List<List<int>> maze = [];
-  List<List<int>> hintPath = []; // Yeni: İpucu koordinatlarını tutacak liste [[satir, sutun], [satir, sutun]]
+  List<List<int>> hintPath = []; 
 
   MazeGameController() {
     resetGame();
@@ -19,8 +20,8 @@ class MazeGameController extends ChangeNotifier {
   void resetGame() {
     maze = MazeLevels.levels[currentMazeIndex].map((row) => List<int>.from(row)).toList();
     isGameWon = false;
-    currentSteps = 0;    // Yeni: Bölüm başında adımı sıfırla
-    hintPath.clear();    // Yeni: Bölüm başında ipuçlarını temizle
+    currentSteps = 0;    
+    hintPath.clear();    
     _findPlayerStartPosition();
     notifyListeners();
   }
@@ -60,9 +61,28 @@ class MazeGameController extends ChangeNotifier {
     playerCol = newCol;
     maze[playerRow][playerCol] = 2; 
     
-    currentSteps++; // Yeni: Karakter her başarılı hareketinde adımı 1 artır
-    hintPath.clear(); // Yeni: Oyuncu hareket ettiğinde eski ipucunu ekrandan sil
+    currentSteps++; 
+    hintPath.clear(); // Karakter hareket edince eski ipuçlarını sil
 
     notifyListeners(); 
+  }
+
+  // EKSİK OLAN VE HATA VERDİREN FONKSİYON BURASI
+  void getHint() {
+    if (isGameWon) return;
+
+    // A* Algoritmasını çağır ve tam rotayı hesapla
+    List<List<int>> fullPath = AStarPathfinder.findPath(maze, playerRow, playerCol);
+
+    // Eğer bir yol bulunduysa
+    if (fullPath.length > 1) {
+      // Çıkış çok yakınsa olanı al, değilse önündeki 3 adımı al
+      int takeCount = fullPath.length > 4 ? 4 : fullPath.length;
+      
+      // İlk elemanı (karakterin kendi konumu) atla, sonraki adımları listeye kopyala
+      hintPath = fullPath.sublist(1, takeCount);
+      
+      notifyListeners(); // Ekranı sarıya boyaması için UI'ı uyar
+    }
   }
 }
