@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../data/maze_levels.dart'; 
-import '../ai/a_star_pathfinder.dart'; // AI dosyamızı içeri aktardık
+import '../ai/a_star_pathfinder.dart'; 
 
 class MazeGameController extends ChangeNotifier {
   int playerRow = 0;
@@ -12,6 +12,8 @@ class MazeGameController extends ChangeNotifier {
 
   List<List<int>> maze = [];
   List<List<int>> hintPath = []; 
+  
+  bool _isHintAnimating = false; // Animasyonun oynayıp oynamadığını takip eder
 
   MazeGameController() {
     resetGame();
@@ -21,7 +23,8 @@ class MazeGameController extends ChangeNotifier {
     maze = MazeLevels.levels[currentMazeIndex].map((row) => List<int>.from(row)).toList();
     isGameWon = false;
     currentSteps = 0;    
-    hintPath.clear();    
+    hintPath.clear();
+    _isHintAnimating = false;
     _findPlayerStartPosition();
     notifyListeners();
   }
@@ -62,27 +65,41 @@ class MazeGameController extends ChangeNotifier {
     maze[playerRow][playerCol] = 2; 
     
     currentSteps++; 
-    hintPath.clear(); // Karakter hareket edince eski ipuçlarını sil
+    
+    // Oyuncu hareket ettiği an ipucu animasyonunu iptal et ve sarı yolları temizle
+    _isHintAnimating = false; 
+    hintPath.clear(); 
 
     notifyListeners(); 
   }
 
-  // EKSİK OLAN VE HATA VERDİREN FONKSİYON BURASI
-  void getHint() {
-    if (isGameWon) return;
+  // Fonksiyona "async" ekledik
+  Future<void> getHint() async {
+    // Oyun bittiyse veya zaten bir animasyon oynuyorsa butona basılmasını engelle
+    if (isGameWon || _isHintAnimating) return;
 
-    // A* Algoritmasını çağır ve tam rotayı hesapla
     List<List<int>> fullPath = AStarPathfinder.findPath(maze, playerRow, playerCol);
 
-    // Eğer bir yol bulunduysa
     if (fullPath.length > 1) {
-      // Çıkış çok yakınsa olanı al, değilse önündeki 3 adımı al
-      int takeCount = fullPath.length > 4 ? 4 : fullPath.length;
+      int takeCount = fullPath.length > 6 ? 6 : fullPath.length;
+      List<List<int>> stepsToAnimate = fullPath.sublist(1, takeCount);
       
-      // İlk elemanı (karakterin kendi konumu) atla, sonraki adımları listeye kopyala
-      hintPath = fullPath.sublist(1, takeCount);
+      _isHintAnimating = true;
+      hintPath.clear();
+
+      // İpuçlarını tek seferde değil, sırayla (animasyonlu) ekliyoruz
+      for (var step in stepsToAnimate) {
+        // Eğer bu döngü çalışırken oyuncu hareket ettiyse (movePlayer çalıştıysa) animasyonu durdur
+        if (!_isHintAnimating) break; 
+
+        hintPath.add(step);
+        notifyListeners(); // Arayüze "yeni kare eklendi, çiz" de
+        
+        // Her kare arasında 250 milisaniye (çeyrek saniye) bekle
+        await Future.delayed(const Duration(milliseconds: 250)); 
+      }
       
-      notifyListeners(); // Ekranı sarıya boyaması için UI'ı uyar
+      _isHintAnimating = false; // Animasyon bitti
     }
   }
 }
