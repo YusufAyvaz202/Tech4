@@ -9,11 +9,12 @@ class MazeGameController extends ChangeNotifier {
   
   int currentMazeIndex = 0; 
   int currentSteps = 0; 
+  int optimalSteps = 0; // Yeni: A* algoritmasının bulduğu kusursuz adım sayısı
 
   List<List<int>> maze = [];
   List<List<int>> hintPath = []; 
   
-  bool _isHintAnimating = false; // Animasyonun oynayıp oynamadığını takip eder
+  bool _isHintAnimating = false; 
 
   MazeGameController() {
     resetGame();
@@ -26,7 +27,15 @@ class MazeGameController extends ChangeNotifier {
     hintPath.clear();
     _isHintAnimating = false;
     _findPlayerStartPosition();
+    _calculateOptimalSteps(); // Yeni: Bölüm başlarken A* rotasını arka planda hesapla
     notifyListeners();
+  }
+
+  // A* algoritmasını başlangıçta çalıştırıp en kısa yolu bulur
+  void _calculateOptimalSteps() {
+    List<List<int>> fullPath = AStarPathfinder.findPath(maze, playerRow, playerCol);
+    // Yol listesi, karakterin kendi durduğu kareyi de (ilk eleman) içerdiği için 1 çıkarıyoruz
+    optimalSteps = fullPath.isNotEmpty ? fullPath.length - 1 : 0;
   }
 
   void loadNextMaze() {
@@ -66,40 +75,34 @@ class MazeGameController extends ChangeNotifier {
     
     currentSteps++; 
     
-    // Oyuncu hareket ettiği an ipucu animasyonunu iptal et ve sarı yolları temizle
     _isHintAnimating = false; 
     hintPath.clear(); 
 
     notifyListeners(); 
   }
 
-  // Fonksiyona "async" ekledik
   Future<void> getHint() async {
-    // Oyun bittiyse veya zaten bir animasyon oynuyorsa butona basılmasını engelle
     if (isGameWon || _isHintAnimating) return;
 
     List<List<int>> fullPath = AStarPathfinder.findPath(maze, playerRow, playerCol);
 
     if (fullPath.length > 1) {
-      int takeCount = fullPath.length > 6 ? 6 : fullPath.length;
+      int takeCount = fullPath.length > 4 ? 4 : fullPath.length;
       List<List<int>> stepsToAnimate = fullPath.sublist(1, takeCount);
       
       _isHintAnimating = true;
       hintPath.clear();
 
-      // İpuçlarını tek seferde değil, sırayla (animasyonlu) ekliyoruz
       for (var step in stepsToAnimate) {
-        // Eğer bu döngü çalışırken oyuncu hareket ettiyse (movePlayer çalıştıysa) animasyonu durdur
         if (!_isHintAnimating) break; 
 
         hintPath.add(step);
-        notifyListeners(); // Arayüze "yeni kare eklendi, çiz" de
+        notifyListeners(); 
         
-        // Her kare arasında 250 milisaniye (çeyrek saniye) bekle
         await Future.delayed(const Duration(milliseconds: 250)); 
       }
       
-      _isHintAnimating = false; // Animasyon bitti
+      _isHintAnimating = false; 
     }
   }
 }

@@ -42,7 +42,7 @@ class MazeGridBoard extends StatelessWidget {
               cellColor = Colors.white;
             }
 
-            // Container yerine AnimatedContainer kullanıyoruz
+            // Kayan animasyon için AnimatedContainer kullanıyoruz
             return AnimatedContainer(
               duration: const Duration(milliseconds: 300), // Renk değişim süresi
               curve: Curves.easeInOut, // Animasyonun yumuşaklık eğrisi

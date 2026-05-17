@@ -35,16 +35,49 @@ class _MazeEscapeScreenState extends State<MazeEscapeScreen> {
       barrierDismissible: false,
       builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)), 
-        title: Row(
-          children: const [
+        title: const Row(
+          children: [
             Icon(Icons.emoji_events, color: Colors.amber, size: 32),
             SizedBox(width: 8),
             Text('Tebrikler!'),
           ],
         ),
-        content: Text(
-          'Labirenti ${_controller.currentSteps} adımda başarıyla tamamladın!',
-          style: const TextStyle(fontSize: 16),
+        // Sadece bir Text yerine alt alta elemanlar dizebilmek için Column kullandık
+        content: Column(
+          mainAxisSize: MainAxisSize.min, // İçeriği sıkıştırır, ekranı kaplamasını engeller
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Labirenti ${_controller.currentSteps} adımda başarıyla tamamladın!',
+              style: const TextStyle(fontSize: 16),
+            ),
+            const SizedBox(height: 16), // Araya biraz boşluk
+            // Yapay Zeka Karşılaştırma Kutusu
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.deepPurple.shade50,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.deepPurple.shade200),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.psychology, color: Colors.deepPurple, size: 28),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'A* Algoritmasının Kusursuz Çözümü: ${_controller.optimalSteps} adım',
+                      style: const TextStyle(
+                        fontSize: 14, 
+                        fontWeight: FontWeight.bold, 
+                        color: Colors.deepPurple,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
         actions: [
           TextButton(
