@@ -15,7 +15,10 @@ class _TicTacToeScreenState extends State<TicTacToeScreen> {
   List<String> board = List.filled(9, "");
   // Sıranın oyuncuda (X) olup olmadığını tutan değişken
   bool isPlayerTurn = true;
-  MinimaxAI ai = MinimaxAI(); // Yapay zeka motorumuzu başlattık
+  MinimaxAI ai = MinimaxAI();
+  // YENİ EKLENECEK DEĞİŞKENLER:
+  int? selectedErrorRate; // null ise seçim ekranındayız, değer varsa oyun ekranındayız.
+  String selectedDifficultyName = ""; // Ekranda hangi modda olduğumuzu yazmak için. // Yapay zeka motorumuzu başlattık
 
 void _makeMove(int index) async {
     // 1. KORUMA: Eğer hücre doluysa veya sıra sende değilse (AI düşünüyorsa) tıklamayı yoksay
@@ -39,7 +42,7 @@ void _makeMove(int index) async {
     await Future.delayed(const Duration(milliseconds: 500));
 
     // AI'a mevcut tahtayı ve kazananı anlama fonksiyonumuzu verip en iyi hamleyi soruyoruz
-    int aiMove = ai.getBestMove(board, checkWinner);
+    int aiMove = ai.getBestMove(board, checkWinner, selectedErrorRate!);
 
     // Eğer AI yapacak geçerli bir hamle bulduysa
     if (aiMove != -1) {
@@ -125,68 +128,154 @@ void _makeMove(int index) async {
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.grey[900], // Şık bir karanlık tema başlangıcı
-      appBar: AppBar(
-        title: const Text('Yapay Zeka vs Sen'),
-        backgroundColor: Colors.teal,
-        centerTitle: true,
+Widget _buildSelectionScreen() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        const Text(
+          "Zorluk Seviyesi Seç",
+          style: TextStyle(
+            color: Colors.white, 
+            fontSize: 28, 
+            fontWeight: FontWeight.bold
+          ),
+        ),
+        const SizedBox(height: 40),
+        _difficultyButton("KOLAY", 60, Colors.green),
+        _difficultyButton("ZOR", 30, Colors.orange),
+        _difficultyButton("İMKANSIZ", 0, Colors.red),
+        const SizedBox(height: 60),
+        // Diğer dersle birleştiğinde kullanılacak "Ana Menüye Dön" butonu için yerimiz hazır
+        TextButton.icon(
+          onPressed: () { 
+            /* Navigator.pop(context); - Diğer oyunlarla birleşince açılacak */ 
+          },
+          icon: const Icon(Icons.arrow_back, color: Colors.tealAccent),
+          label: const Text(
+            "Ana Menüye Dön", 
+            style: TextStyle(color: Colors.tealAccent)
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _difficultyButton(String name, int rate, Color color) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 50),
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: color,
+          minimumSize: const Size(double.infinity, 60),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15)
+          ),
+        ),
+        onPressed: () {
+          setState(() {
+            selectedErrorRate = rate;
+            selectedDifficultyName = name;
+          });
+        },
+        child: Text(
+          name, 
+          style: const TextStyle(
+            fontSize: 20, 
+            fontWeight: FontWeight.bold, 
+            color: Colors.white
+          )
+        ),
       ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          // Sıranın kimde olduğunu gösterecek alan (Şimdilik statik)
-// En baştaki const kelimesini kaldırdık
+    );
+  }
+
+  Widget _buildGameScreen() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        // Sıra Göstergesi
         Padding(
-          padding: const EdgeInsets.all(16.0), // const'u sadece bu sabit değere verdik
+          padding: const EdgeInsets.all(16.0),
           child: Text(
             isPlayerTurn ? "Sıra: X" : "Sıra: AI",
             style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
           ),
         ),
-                  
-          // 3x3 Oyun Tahtası
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: GridView.builder(
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 3, // 3 sütun
-                  crossAxisSpacing: 8, // Sütunlar arası boşluk
-                  mainAxisSpacing: 8, // Satırlar arası boşluk
-                ),
-                itemCount: 9, // Toplam 9 kare
-                itemBuilder: (context, index) {
-                  // Her bir hücrenin tasarımı
-                  return GestureDetector(
-                    onTap: () {
-                  _makeMove(index); // Artık print yerine yazdığımız fonksiyonu çağırıyoruz
-},
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.grey[800],
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Center(
-                        child:Text(
-                        board[index], // Koşulu kaldırdık, dizide ne varsa direkt onu basacak
+        
+        // 3x3 Oyun Tahtası
+        Expanded(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: GridView.builder(
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 3,
+                crossAxisSpacing: 8,
+                mainAxisSpacing: 8,
+              ),
+              itemCount: 9,
+              itemBuilder: (context, index) {
+                return GestureDetector(
+                  onTap: () {
+                    _makeMove(index);
+                  },
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.grey[800],
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Center(
+child: Text(
+                        board[index], // Koşulları sildik, sadece tahtadaki harfi (X veya O) basacak
                         style: TextStyle(
-                          color: board[index] == "X" ? Colors.blueAccent : Colors.redAccent, 
-                          fontSize: 60, // Fontu tekrar standart boyuta sabitledik
+                          color: board[index] == "X" ? Colors.blueAccent : Colors.redAccent,
+                          fontSize: 60, // Soru işaretli koşulu sildik, tüm harfler aynı boy (60) olacak
                           fontWeight: FontWeight.bold,
                         ),
-                      )
                       ),
                     ),
-                  );
-                },
-              ),
+                  ),
+                );
+              },
             ),
           ),
-        ],
+        ),
+
+        // İŞTE YENİ "ZORLUK SEÇİMİNE DÖN" BUTONUMUZ
+        Padding(
+          padding: const EdgeInsets.only(bottom: 20.0), 
+          child: TextButton.icon(
+            onPressed: () {
+              setState(() {
+                selectedErrorRate = null; // null yaparak zorluk seçim ekranına dönüyoruz
+                _resetGame(); // Oyun tahtasını sıfırlıyoruz
+              });
+            },
+            icon: const Icon(Icons.settings_backup_restore, color: Colors.tealAccent),
+            label: const Text("Zorluk Seçimine Dön", style: TextStyle(color: Colors.tealAccent)),
+          ),
+        ),
+      ],
+    );
+  }
+
+
+
+
+  // 2. ADIM: Uygulamanın ana vitrini (Hangi ekranın açılacağını kontrol eder)
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.grey[900], 
+      appBar: AppBar(
+        // Zorluk seçilmediyse genel başlık, seçildiyse aktif modu üstte yazar
+        title: Text(selectedErrorRate == null ? 'Tic Tac Toe' : 'Mod: $selectedDifficultyName'),
+        backgroundColor: Colors.teal,
+        centerTitle: true,
       ),
+      // Seçim yapıldıysa oyun ekranını, yapılmadıysa zorluk seçme ekranını gösterir
+      body: selectedErrorRate == null 
+          ? _buildSelectionScreen() 
+          : _buildGameScreen(),
     );
   }
 }

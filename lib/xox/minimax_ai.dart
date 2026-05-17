@@ -2,7 +2,7 @@ import 'dart:math';
 
 class MinimaxAI {
   // AI'ın hamle kararını verdiği ana fonksiyon
-  int getBestMove(List<String> board, Function(List<String>) checkWinner) {
+  int getBestMove(List<String> board, Function(List<String>) checkWinner, int errorRate) {
     List<int> availableMoves = [];
     
     // Tahtadaki boş hücrelerin indekslerini bul ve listeye ekle
@@ -16,15 +16,15 @@ class MinimaxAI {
     if (availableMoves.isEmpty) return -1;
 
     // --- ZORLUK SEVİYESİ (%30 İHTİMALLE HATA YAPMA) ---
-    Random random = Random();
-    int chance = random.nextInt(100); // 0 ile 99 arası sayı üret
-    
-    if (chance < 40) {
-      // %30 İhtimalle: Rastgele boş bir hücre seç
-      print("AI Hata Yaptı! (Rastgele Hamle)");
-      int randomIndex = random.nextInt(availableMoves.length);
-      return availableMoves[randomIndex];
-    }
+Random random = Random();
+  int chance = random.nextInt(100); 
+  
+  // BURASI KRİTİK: errorRate artık dışarıdan (arayüzden) geliyor.
+  if (chance < errorRate) {
+    print("AI Hata Yaptı! (Zorluk: %$errorRate hata payı)");
+    int randomIndex = random.nextInt(availableMoves.length);
+    return availableMoves[randomIndex];
+  }
 
     // --- %70 İHTİMALLE: MİNİMAX İLE KUSURSUZ HAMLE ---
     print("AI Düşünüyor... (Minimax Devrede)");
