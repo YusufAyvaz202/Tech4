@@ -27,7 +27,7 @@ class MazeGameController extends ChangeNotifier {
     hintPath.clear();
     _isHintAnimating = false;
     _findPlayerStartPosition();
-    _calculateOptimalSteps(); // Yeni: Bölüm başlarken A* rotasını arka planda hesapla
+    _calculateOptimalSteps(); // Bölüm başlarken A* rotasını arka planda hesapla
     notifyListeners();
   }
 
@@ -87,7 +87,7 @@ class MazeGameController extends ChangeNotifier {
     List<List<int>> fullPath = AStarPathfinder.findPath(maze, playerRow, playerCol);
 
     if (fullPath.length > 1) {
-      int takeCount = fullPath.length > 4 ? 4 : fullPath.length;
+      int takeCount = fullPath.length > 6 ? 6 : fullPath.length;
       List<List<int>> stepsToAnimate = fullPath.sublist(1, takeCount);
       
       _isHintAnimating = true;
