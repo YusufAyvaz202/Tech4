@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart'; // For rootBundle to read JSON
 import '../models/sudoku_board.dart';
 import 'game_validator.dart';
+import '../ai/sudoku_ai.dart';
 
 class GameProvider extends ChangeNotifier {
   SudokuBoard? board;
@@ -122,6 +123,27 @@ class GameProvider extends ChangeNotifier {
     if (isComplete) {
       // In Phase 5, we will trigger a win dialog/animation here.
       debugPrint("YOU WIN!");
+    }
+  }
+
+  // Requests a hint from the AI for the currently selected cell.
+  void useHint() {
+    if (board == null || selectedRow == null || selectedCol == null) return;
+
+    var currentCell = board!.grid[selectedRow!][selectedCol!];
+    
+    // No need for a hint if the cell is already fixed.
+    if (currentCell.isFixed) return;
+
+    // Get the correct answer from the AI logic.
+    int? hintValue = SudokuAI.getHint(board!, selectedRow!, selectedCol!);
+
+    if (hintValue != null) {
+      // Apply the hint directly to the cell and clear any error state.
+      currentCell.value = hintValue;
+      currentCell.isWrong = false;
+      notifyListeners();
+      _checkWinCondition();
     }
   }
 }
