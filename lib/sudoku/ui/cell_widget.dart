@@ -38,8 +38,20 @@ class CellWidget extends StatelessWidget {
 
   // Determines background color based on selection and error state.
   Color _getBackgroundColor(SudokuCell cell) {
-    if (cell.isSelected) return Colors.blue.withOpacity(0.3);
-    if (cell.isWrong) return Colors.red.withOpacity(0.2); // Instant error validation
+    // Check the error state first. 
+    // If the move is invalid, show a red background immediately.
+    if (cell.isWrong) {
+      // If the cell is both wrong and currently selected, make it a bit darker red
+      // so the user still knows it is active.
+      return cell.isSelected ? Colors.red.withOpacity(0.4) : Colors.red.withOpacity(0.2);
+    }
+    
+    // If there is no error, check if the cell is selected.
+    if (cell.isSelected) {
+      return Colors.blue.withOpacity(0.3);
+    }
+    
+    // Default background color for empty or correctly filled unselected cells.
     return Colors.white;
   }
 

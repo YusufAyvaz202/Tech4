@@ -76,16 +76,11 @@ class GameProvider extends ChangeNotifier {
     // Update the cell's value.
     currentCell.value = number;
 
-    // Instant Error Validation requested by the user.
-    // If the move is not valid, mark as wrong so UI can show red color.
-    bool isValid = GameValidator.isValidMove(
-      grid: board!.grid,
-      row: selectedRow!,
-      col: selectedCol!,
-      value: number,
-    );
+    // Get the absolute correct answer from the AI to compare.
+    int? correctAnswer = SudokuAI.getHint(board!, selectedRow!, selectedCol!);
 
-    currentCell.isWrong = !isValid;
+    // If the user's input does not match the absolute solution, mark it as wrong.
+    currentCell.isWrong = (number != correctAnswer);
 
     notifyListeners();
     _checkWinCondition();
