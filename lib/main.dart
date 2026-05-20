@@ -14,7 +14,7 @@ void main() {
 }
 
 class SudokuApp extends StatelessWidget {
-  const SudokuApp({Key? key}) : super(key: key);
+  const SudokuApp({super.key});
 
   @override
   Widget build(BuildContext context) {

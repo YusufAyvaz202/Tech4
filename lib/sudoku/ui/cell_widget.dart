@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../logic/game_provider.dart';
@@ -7,7 +9,7 @@ class CellWidget extends StatelessWidget {
   final int row;
   final int col;
 
-  const CellWidget({Key? key, required this.row, required this.col}) : super(key: key);
+  const CellWidget({super.key, required this.row, required this.col});
 
   @override
   Widget build(BuildContext context) {
