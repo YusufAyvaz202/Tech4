@@ -11,7 +11,6 @@ class GameScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final isLoading = context.select((GameProvider p) => p.isLoading);
     
-    // --- LISTEN TO WIN/LOSE STATES FOR POPUPS ---
     final isWon = context.select((GameProvider p) => p.isWon);
     final isLost = context.select((GameProvider p) => p.isLost);
 
@@ -19,14 +18,12 @@ class GameScreen extends StatelessWidget {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!context.mounted) return;
         
-        // Store the result state, then clear provider flags to avoid duplicate dialogs
         final checkWon = isWon;
         context.read<GameProvider>().acknowledgeResult();
         
         _showResultDialog(context, checkWon);
       });
     }
-    // --------------------------------------------
 
     return Scaffold(
       appBar: AppBar(
@@ -40,7 +37,6 @@ class GameScreen extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // --- TOP BAR: TIMER & MISTAKES INFO ---
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -76,11 +72,11 @@ class GameScreen extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 20),
-                  // ---------------------------------------
 
                   const BoardWidget(),
                   const SizedBox(height: 30),
                   
+                  // The AI Hint Button
                   SizedBox(
                     width: double.infinity,
                     height: 50,
@@ -100,6 +96,29 @@ class GameScreen extends StatelessWidget {
                     ),
                   ),
                   
+                  const SizedBox(height: 10), // Spacing between buttons
+                  
+                  // --- NEW AUTO SOLVE BUTTON ---
+                  SizedBox(
+                    width: double.infinity,
+                    height: 50,
+                    child: ElevatedButton.icon(
+                      icon: const Icon(Icons.auto_awesome),
+                      label: const Text(
+                        'Solve Entire Puzzle',
+                        style: TextStyle(fontSize: 18),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.purple.shade400,
+                        foregroundColor: Colors.white,
+                      ),
+                      onPressed: () {
+                        context.read<GameProvider>().solveEntirePuzzle();
+                      },
+                    ),
+                  ),
+                  // -----------------------------
+                  
                   const SizedBox(height: 20),
                   const NumberPadWidget(),
                 ],
@@ -108,7 +127,6 @@ class GameScreen extends StatelessWidget {
     );
   }
 
-  // --- NEW METHOD TO SHOW WIN OR LOSE DIALOG ---
   void _showResultDialog(BuildContext context, bool isWon) {
     showDialog(
       context: context,

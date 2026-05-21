@@ -1,4 +1,4 @@
-import 'dart:async'; // Timer için eklendi
+import 'dart:async'; 
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart'; 
@@ -15,12 +15,10 @@ class GameProvider extends ChangeNotifier {
   final ValueNotifier<int> elapsedTime = ValueNotifier<int>(0); 
   Timer? _timer;
 
-  // --- NEW VARIABLES FOR GAME STATES ---
-  int mistakes = 0;
   int maxMistakes = 3;
-  bool isWon = false;
   bool isLost = false;
-  // -------------------------------------
+  bool isWon = false;
+  int mistakes = 0;
 
   GameProvider() {
     loadPuzzle();
@@ -41,11 +39,9 @@ class GameProvider extends ChangeNotifier {
       board = SudokuBoard.fromList(boardData);
       _solutionGrid = SudokuAI.getSolution(board!);
       
-      // --- RESET GAME STATES ON LOAD ---
       mistakes = 0;
       isWon = false;
       isLost = false;
-      // ---------------------------------
 
       selectedRow = null;
       selectedCol = null;
@@ -59,13 +55,11 @@ class GameProvider extends ChangeNotifier {
     }
   }
 
-  // --- NEW METHOD TO HANDLE NEXT LEVEL LOGIC ---
   void startNextLevel() {
     // Placeholder for next level, currently reloads the puzzle
     loadPuzzle();
   }
 
-  // --- NEW METHOD TO CLEAR STATUS FLAGS AFTER DIALOG SHOWS ---
   void acknowledgeResult() {
     isWon = false;
     isLost = false;
@@ -105,7 +99,6 @@ class GameProvider extends ChangeNotifier {
     int? correctAnswer = _solutionGrid?[selectedRow!][selectedCol!];
     currentCell.isWrong = (number != correctAnswer);
 
-    // --- TRACK MISTAKES AND LOSE CONDITION ---
     if (currentCell.isWrong) {
       mistakes++;
       if (mistakes >= maxMistakes) {
@@ -113,7 +106,6 @@ class GameProvider extends ChangeNotifier {
         _timer?.cancel();
       }
     }
-    // ----------------------------------------
 
     notifyListeners();
     
@@ -144,13 +136,11 @@ class GameProvider extends ChangeNotifier {
       }
     }
 
-    // --- TRIGGER WIN STATE ---
     if (isComplete) {
       _timer?.cancel();
       isWon = true;
       notifyListeners();
     }
-    // -------------------------
   }
 
   void useHint() {
@@ -166,6 +156,30 @@ class GameProvider extends ChangeNotifier {
       notifyListeners();
       _checkWinCondition();
     }
+  }
+
+  // --- NEW METHOD TO SOLVE THE ENTIRE PUZZLE ---
+  void solveEntirePuzzle() {
+    // Check if board exists or if the game has already concluded
+    if (board == null || isLost || isWon || _solutionGrid == null) return;
+
+    // Iterate through every cell on the board
+    for (int r = 0; r < 9; r++) {
+      for (int c = 0; c < 9; c++) {
+        var cell = board!.grid[r][c];
+        
+        // Fill empty or incorrect cells with the correct answers from cache
+        if (!cell.isFixed) {
+          if (cell.value == null || cell.isWrong) {
+            cell.value = _solutionGrid![r][c];
+            cell.isWrong = false;
+          }
+        }
+      }
+    }
+
+    notifyListeners();
+    _checkWinCondition(); // This will trigger the win state immediately
   }
 
   @override
