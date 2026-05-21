@@ -9,7 +9,6 @@ class GameScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Listen to isLoading state to show a loader while JSON is read.
     final isLoading = context.select((GameProvider p) => p.isLoading);
 
     return Scaffold(
@@ -24,10 +23,29 @@ class GameScreen extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  // --- EKLENEN SAYAC (TIMER) GÖSTERGESİ ---
+                  ValueListenableBuilder<int>(
+                    valueListenable: context.read<GameProvider>().elapsedTime,
+                    builder: (context, timeInSeconds, child) {
+                      final minutes = (timeInSeconds ~/ 60).toString().padLeft(2, '0');
+                      final seconds = (timeInSeconds % 60).toString().padLeft(2, '0');
+                      
+                      return Text(
+                        "$minutes:$seconds",
+                        style: const TextStyle(
+                          fontSize: 28, 
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black87,
+                        ),
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 15),
+                  // ---------------------------------------
+
                   const BoardWidget(),
                   const SizedBox(height: 30),
                   
-                  // The AI Hint Button
                   SizedBox(
                     width: double.infinity,
                     height: 50,
