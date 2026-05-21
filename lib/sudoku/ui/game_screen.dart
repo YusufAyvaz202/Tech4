@@ -10,6 +10,23 @@ class GameScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isLoading = context.select((GameProvider p) => p.isLoading);
+    
+    // --- LISTEN TO WIN/LOSE STATES FOR POPUPS ---
+    final isWon = context.select((GameProvider p) => p.isWon);
+    final isLost = context.select((GameProvider p) => p.isLost);
+
+    if (isWon || isLost) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!context.mounted) return;
+        
+        // Store the result state, then clear provider flags to avoid duplicate dialogs
+        final checkWon = isWon;
+        context.read<GameProvider>().acknowledgeResult();
+        
+        _showResultDialog(context, checkWon);
+      });
+    }
+    // --------------------------------------------
 
     return Scaffold(
       appBar: AppBar(
@@ -23,24 +40,42 @@ class GameScreen extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // --- EKLENEN SAYAC (TIMER) GÖSTERGESİ ---
-                  ValueListenableBuilder<int>(
-                    valueListenable: context.read<GameProvider>().elapsedTime,
-                    builder: (context, timeInSeconds, child) {
-                      final minutes = (timeInSeconds ~/ 60).toString().padLeft(2, '0');
-                      final seconds = (timeInSeconds % 60).toString().padLeft(2, '0');
-                      
-                      return Text(
-                        "$minutes:$seconds",
-                        style: const TextStyle(
-                          fontSize: 28, 
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black87,
-                        ),
-                      );
-                    },
+                  // --- TOP BAR: TIMER & MISTAKES INFO ---
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      ValueListenableBuilder<int>(
+                        valueListenable: context.read<GameProvider>().elapsedTime,
+                        builder: (context, timeInSeconds, child) {
+                          final minutes = (timeInSeconds ~/ 60).toString().padLeft(2, '0');
+                          final seconds = (timeInSeconds % 60).toString().padLeft(2, '0');
+                          
+                          return Text(
+                            "Süre: $minutes:$seconds",
+                            style: const TextStyle(
+                              fontSize: 20, 
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black87,
+                            ),
+                          );
+                        },
+                      ),
+                      Selector<GameProvider, int>(
+                        selector: (_, provider) => provider.mistakes,
+                        builder: (context, mistakes, child) {
+                          return Text(
+                            "Hatalar: $mistakes/3",
+                            style: TextStyle(
+                              fontSize: 20, 
+                              fontWeight: FontWeight.bold,
+                              color: mistakes > 0 ? Colors.red.shade700 : Colors.black87,
+                            ),
+                          );
+                        },
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 15),
+                  const SizedBox(height: 20),
                   // ---------------------------------------
 
                   const BoardWidget(),
@@ -70,6 +105,48 @@ class GameScreen extends StatelessWidget {
                 ],
               ),
             ),
+    );
+  }
+
+  // --- NEW METHOD TO SHOW WIN OR LOSE DIALOG ---
+  void _showResultDialog(BuildContext context, bool isWon) {
+    showDialog(
+      context: context,
+      barrierDismissible: false, // Prevent closing by tapping outside
+      builder: (dialogContext) => AlertDialog(
+        title: Text(
+          isWon ? 'Tebrikler! 🎉' : 'Oyun Bitti ❌',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: isWon ? Colors.green : Colors.red,
+          ),
+        ),
+        content: Text(
+          isWon 
+              ? 'Sudoku bulmacasını başarıyla çözdünüz!' 
+              : '3 hata yaptığınız için oyunu kaybettiniz.',
+          style: const TextStyle(fontSize: 16),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              // Main Menu action is left empty for now
+            },
+            child: const Text('Ana Menü'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.of(dialogContext).pop();
+              if (isWon) {
+                context.read<GameProvider>().startNextLevel();
+              } else {
+                context.read<GameProvider>().loadPuzzle();
+              }
+            },
+            child: Text(isWon ? 'Sonraki Seviye' : 'Tekrar Dene'),
+          ),
+        ],
+      ),
     );
   }
 }
