@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart'; // For rootBundle to read JSON
 import '../models/sudoku_board.dart';
-import 'game_validator.dart';
 import '../ai/sudoku_ai.dart';
 
 class GameProvider extends ChangeNotifier {
