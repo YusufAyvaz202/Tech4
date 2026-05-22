@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../AI/minimax_ai.dart'; 
 
 void main() {
   runApp(const ConnectFourApp());
@@ -28,20 +29,26 @@ class GameScreen extends StatefulWidget {
 }
 
 class _GameScreenState extends State<GameScreen> {
- 
   List<List<int>> board = List.generate(6, (_) => List.generate(7, (_) => 0));
   
   int currentPlayer = 1; 
   int? playerColor; 
   bool isGameOver = false; 
-
   
+  bool isAiThinking = false;
+  late ConnectFourAI ai; 
+
   void _startGame(int selectedColor) {
     setState(() {
       playerColor = selectedColor;
+      int aiColor = selectedColor == 1 ? 2 : 1;
+      ai = ConnectFourAI(aiPiece: aiColor, playerPiece: selectedColor);
+
+      if (currentPlayer == aiColor) {
+        _makeAiMove();
+      }
     });
   }
-
 
   void _resetGame() {
     setState(() {
@@ -49,33 +56,48 @@ class _GameScreenState extends State<GameScreen> {
       currentPlayer = 1;
       playerColor = null;
       isGameOver = false;
+      isAiThinking = false;
     });
   }
 
- 
-  void _dropPiece(int col) {
-    if (isGameOver) return; 
+  void _handleTap(int col) {
+    if (isGameOver || isAiThinking || currentPlayer != playerColor) return;
+    _processDrop(col);
+  }
 
+  void _makeAiMove() async {
+    setState(() { isAiThinking = true; }); 
+
+    await Future.delayed(const Duration(milliseconds: 500));
+    AiMove bestMove = ai.getBestMove(board, 5, -99999999, 99999999, true);
+
+    setState(() { isAiThinking = false; }); 
+    
+    if (bestMove.column != -1) {
+      _processDrop(bestMove.column);
+    }
+  }
+
+  void _processDrop(int col) {
     for (int row = 5; row >= 0; row--) {
       if (board[row][col] == 0) {
         setState(() {
           board[row][col] = currentPlayer;
 
-         
           if (_checkWinner(currentPlayer)) {
             isGameOver = true;
-            String winnerText = currentPlayer == playerColor ? 'Tebrikler, Kazandın!' : 'Rakip Kazandı!';
+            String winnerText = currentPlayer == playerColor ? 'Tebrikler, Kazandın!' : 'Yapay Zeka Kazandı!';
             Color winnerColor = currentPlayer == 1 ? Colors.red : Colors.yellow[800]!;
             _showGameOverDialog(winnerText, winnerColor);
-          } 
-         
-          else if (_checkDraw()) {
+          } else if (_checkDraw()) {
             isGameOver = true;
             _showGameOverDialog('Oyun Berabere!', Colors.blue);
-          } 
-        
-          else {
+          } else {
             currentPlayer = currentPlayer == 1 ? 2 : 1;
+            
+            if (currentPlayer != playerColor) {
+              _makeAiMove();
+            }
           }
         });
         break;
@@ -83,51 +105,30 @@ class _GameScreenState extends State<GameScreen> {
     }
   }
 
- 
   bool _checkWinner(int player) {
-    
     for (int r = 0; r < 6; r++) {
       for (int c = 0; c < 4; c++) {
-        if (board[r][c] == player && board[r][c + 1] == player && 
-            board[r][c + 2] == player && board[r][c + 3] == player) {
-          return true;
-        }
+        if (board[r][c] == player && board[r][c + 1] == player && board[r][c + 2] == player && board[r][c + 3] == player) return true;
       }
     }
-
     for (int r = 0; r < 3; r++) {
       for (int c = 0; c < 7; c++) {
-        if (board[r][c] == player && board[r + 1][c] == player && 
-            board[r + 2][c] == player && board[r + 3][c] == player) {
-          return true;
-        }
+        if (board[r][c] == player && board[r + 1][c] == player && board[r + 2][c] == player && board[r + 3][c] == player) return true;
       }
     }
-
-    
     for (int r = 0; r < 3; r++) {
       for (int c = 0; c < 4; c++) {
-        if (board[r][c] == player && board[r + 1][c + 1] == player && 
-            board[r + 2][c + 2] == player && board[r + 3][c + 3] == player) {
-          return true;
-        }
+        if (board[r][c] == player && board[r + 1][c + 1] == player && board[r + 2][c + 2] == player && board[r + 3][c + 3] == player) return true;
       }
     }
-
- 
     for (int r = 3; r < 6; r++) {
       for (int c = 0; c < 4; c++) {
-        if (board[r][c] == player && board[r - 1][c + 1] == player && 
-            board[r - 2][c + 2] == player && board[r - 3][c + 3] == player) {
-          return true;
-        }
+        if (board[r][c] == player && board[r - 1][c + 1] == player && board[r - 2][c + 2] == player && board[r - 3][c + 3] == player) return true;
       }
     }
-
     return false;
   }
 
- 
   bool _checkDraw() {
     for (int r = 0; r < 6; r++) {
       for (int c = 0; c < 7; c++) {
@@ -137,7 +138,6 @@ class _GameScreenState extends State<GameScreen> {
     return true; 
   }
 
-  
   void _showGameOverDialog(String title, Color color) {
     showDialog(
       context: context,
@@ -184,7 +184,6 @@ class _GameScreenState extends State<GameScreen> {
     );
   }
 
-
   Widget _buildColorSelection() {
     return Center(
       child: Column(
@@ -206,9 +205,7 @@ class _GameScreenState extends State<GameScreen> {
                   decoration: const BoxDecoration(
                     color: Colors.red,
                     shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(color: Colors.black26, blurRadius: 8, offset: Offset(0, 4))
-                    ],
+                    boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 8, offset: Offset(0, 4))],
                   ),
                 ),
               ),
@@ -221,9 +218,7 @@ class _GameScreenState extends State<GameScreen> {
                   decoration: const BoxDecoration(
                     color: Colors.yellow,
                     shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(color: Colors.black26, blurRadius: 8, offset: Offset(0, 4))
-                    ],
+                    boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 8, offset: Offset(0, 4))],
                   ),
                 ),
               ),
@@ -234,7 +229,6 @@ class _GameScreenState extends State<GameScreen> {
     );
   }
 
-
   Widget _buildGameBoard() {
     return Center(
       child: Column(
@@ -243,7 +237,7 @@ class _GameScreenState extends State<GameScreen> {
           Padding(
             padding: const EdgeInsets.only(bottom: 16.0),
             child: Text(
-              currentPlayer == playerColor ? 'Senin Sıran' : 'Rakibin Sırası',
+              currentPlayer == playerColor ? 'Senin Sıran' : 'Yapay Zeka Düşünüyor...',
               style: TextStyle(
                 fontSize: 24, 
                 fontWeight: FontWeight.bold,
@@ -263,13 +257,7 @@ class _GameScreenState extends State<GameScreen> {
                   decoration: BoxDecoration(
                     color: Colors.blue[700],
                     borderRadius: BorderRadius.circular(16.0),
-                    boxShadow: const [
-                      BoxShadow(
-                        color: Colors.black26,
-                        blurRadius: 10,
-                        offset: Offset(0, 5),
-                      ),
-                    ],
+                    boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 10, offset: Offset(0, 5))],
                   ),
                   child: GridView.builder(
                     physics: const NeverScrollableScrollPhysics(),
@@ -286,14 +274,16 @@ class _GameScreenState extends State<GameScreen> {
 
                       return GestureDetector(
                         onTap: () {
-                          _dropPiece(col);
+                          _handleTap(col);
                         },
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: _getPieceColor(cellValue),
-                            shape: BoxShape.circle,
-                          ),
-                        ),
+                        child: cellValue == 0
+                            ? Container(
+                                decoration: const BoxDecoration(
+                                  color: Colors.white,
+                                  shape: BoxShape.circle,
+                                ),
+                              )
+                            : AnimatedPiece(player: cellValue, row: row),
                       );
                     },
                   ),
@@ -305,11 +295,35 @@ class _GameScreenState extends State<GameScreen> {
       ),
     );
   }
+}
 
-  
-  Color _getPieceColor(int value) {
-    if (value == 1) return Colors.red;
-    if (value == 2) return Colors.yellow;
-    return Colors.white;
+class AnimatedPiece extends StatelessWidget {
+  final int player;
+  final int row; 
+
+  const AnimatedPiece({super.key, required this.player, required this.row});
+
+  @override
+  Widget build(BuildContext context) {
+    return TweenAnimationBuilder<Offset>(
+      duration: Duration(milliseconds: 400 + (row * 80)), 
+      curve: Curves.bounceOut, 
+      tween: Tween<Offset>(
+        begin: Offset(0, -(row + 2).toDouble()), 
+        end: Offset.zero, 
+      ),
+      builder: (context, offset, child) {
+        return FractionalTranslation(
+          translation: offset,
+          child: child,
+        );
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          color: player == 1 ? Colors.red : Colors.yellow,
+          shape: BoxShape.circle,
+        ),
+      ),
+    );
   }
 }
