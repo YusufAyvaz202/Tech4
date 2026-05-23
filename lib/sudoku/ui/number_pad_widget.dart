@@ -24,8 +24,14 @@ class NumberPadWidget extends StatelessWidget {
           // Erase Button
           return ElevatedButton(
             onPressed: () => gameProvider.eraseNumber(),
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red.shade100),
-            child: const Icon(Icons.backspace, color: Colors.red),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF1E2640), // Muted Charcoal
+              foregroundColor: const Color(0xFFFF6B6B), // Neon Coral
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+            child: const Icon(Icons.backspace_outlined),
           );
         }
 
@@ -33,9 +39,19 @@ class NumberPadWidget extends StatelessWidget {
         int number = index + 1;
         return ElevatedButton(
           onPressed: () => gameProvider.inputNumber(number),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: const Color(0xFF1E2640), // Muted Charcoal
+            foregroundColor: const Color(0xFF00F5D4), // Electric Teal
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+          ),
           child: Text(
             number.toString(),
-            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            style: const TextStyle(
+              fontSize: 22, 
+              fontWeight: FontWeight.bold,
+            ),
           ),
         );
       },

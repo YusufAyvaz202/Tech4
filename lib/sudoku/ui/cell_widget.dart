@@ -11,7 +11,7 @@ class CellWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Listen to changes for this specific cell through the provider.
+    // Listen to changes for this specific cell through the provider
     final gameProvider = context.watch<GameProvider>();
     final cell = gameProvider.board!.grid[row][col];
 
@@ -27,7 +27,7 @@ class CellWidget extends StatelessWidget {
             cell.value == null ? '' : cell.value.toString(),
             style: TextStyle(
               fontSize: 22,
-              fontWeight: cell.isFixed ? FontWeight.bold : FontWeight.normal,
+              fontWeight: cell.isFixed ? FontWeight.bold : FontWeight.w500,
               color: _getTextColor(cell),
             ),
           ),
@@ -36,39 +36,46 @@ class CellWidget extends StatelessWidget {
     );
   }
 
-  // Determines background color based on selection and error state.
+  // Determines background color based on selection and error state
   Color _getBackgroundColor(SudokuCell cell) {
-    // Check the error state first. 
-    // If the move is invalid, show a red background immediately.
+    // Check the error state first
+    // If the move is invalid, show a neon coral background
     if (cell.isWrong) {
-      // If the cell is both wrong and currently selected, make it a bit darker red
-      // so the user still knows it is active.
-      return cell.isSelected ? Colors.red.withOpacity(0.4) : Colors.red.withOpacity(0.2);
+      return cell.isSelected 
+          ? const Color(0xFFFF6B6B).withOpacity(0.4) 
+          : const Color(0xFFFF6B6B).withOpacity(0.2);
     }
     
-    // If there is no error, check if the cell is selected.
+    // If there is no error, check if the cell is selected
     if (cell.isSelected) {
-      return Colors.blue.withOpacity(0.3);
+      return const Color(0xFF94A3B8).withOpacity(0.3); // Slate Grey with opacity
     }
     
-    // Default background color for empty or correctly filled unselected cells.
-    return Colors.white;
+    // Default background color for empty or correctly filled unselected cells
+    return const Color(0xFF1E2640); // Muted Charcoal
   }
 
-  // Determines text color: Black for fixed, Blue for user input, Red for errors.
+  // Determines text color based on user input, fixed state or error
   Color _getTextColor(SudokuCell cell) {
-    if (cell.isWrong) return Colors.red;
-    if (cell.isFixed) return Colors.black;
-    return Colors.blue.shade800;
+    if (cell.isWrong) return const Color(0xFFFF6B6B); // Neon Coral
+    if (cell.isFixed) return const Color(0xFFF8FAFC); // Off-White
+    return const Color(0xFF00F5D4); // Electric Teal
   }
 
-  // Creates the borders. Thicker borders for 3x3 box boundaries.
+  // Creates the borders. Thicker Off-White borders for 3x3 block boundaries, thin Slate Grey for cells.
   Border _getBorder(int row, int col) {
+    BorderSide getSide(bool isThick) {
+      return BorderSide(
+        width: isThick ? 2.0 : 0.5,
+        color: isThick ? const Color(0xFFF8FAFC) : const Color(0xFF94A3B8), // Off-White vs Slate Grey
+      );
+    }
+
     return Border(
-      top: BorderSide(width: (row % 3 == 0) ? 2.0 : 0.5, color: Colors.black),
-      left: BorderSide(width: (col % 3 == 0) ? 2.0 : 0.5, color: Colors.black),
-      bottom: BorderSide(width: (row == 8) ? 2.0 : 0.5, color: Colors.black),
-      right: BorderSide(width: (col == 8) ? 2.0 : 0.5, color: Colors.black),
+      top: getSide(row % 3 == 0),
+      left: getSide(col % 3 == 0),
+      bottom: getSide(row == 8),
+      right: getSide(col == 8),
     );
   }
 }

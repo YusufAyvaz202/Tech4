@@ -7,10 +7,10 @@ class BoardWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AspectRatio(
-      aspectRatio: 1.0, // Ensures the board is a perfect square.
+      aspectRatio: 1.0, // Ensures the board is a perfect square
       child: Container(
         padding: const EdgeInsets.all(4.0),
-        color: Colors.black, // Dark background for the main thick border
+        color: const Color(0xFFF8FAFC), // Off-White background for the outer main thick border
         child: GridView.builder(
           physics: const NeverScrollableScrollPhysics(), // Disable scrolling inside the board
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(

@@ -26,12 +26,20 @@ class GameScreen extends StatelessWidget {
     }
 
     return Scaffold(
+      backgroundColor: const Color(0xFF121826), // Deep Slate
       appBar: AppBar(
         title: const Text('Sudoku AI'),
         centerTitle: true,
+        backgroundColor: const Color(0xFF121826),
+        foregroundColor: const Color(0xFFF8FAFC), // Off-White
+        elevation: 0,
       ),
       body: isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(
+              child: CircularProgressIndicator(
+                color: Color(0xFF00F5D4), // Electric Teal
+              ),
+            )
           : Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Column(
@@ -51,7 +59,7 @@ class GameScreen extends StatelessWidget {
                             style: const TextStyle(
                               fontSize: 20, 
                               fontWeight: FontWeight.bold,
-                              color: Colors.black87,
+                              color: Color(0xFFF8FAFC), // Off-White
                             ),
                           );
                         },
@@ -64,7 +72,9 @@ class GameScreen extends StatelessWidget {
                             style: TextStyle(
                               fontSize: 20, 
                               fontWeight: FontWeight.bold,
-                              color: mistakes > 0 ? Colors.red.shade700 : Colors.black87,
+                              color: mistakes > 0 
+                                  ? const Color(0xFFFF6B6B) // Neon Coral
+                                  : const Color(0xFFF8FAFC), // Off-White
                             ),
                           );
                         },
@@ -76,19 +86,22 @@ class GameScreen extends StatelessWidget {
                   const BoardWidget(),
                   const SizedBox(height: 30),
                   
-                  // The AI Hint Button
+                  // AI Hint Button
                   SizedBox(
                     width: double.infinity,
                     height: 50,
                     child: ElevatedButton.icon(
-                      icon: const Icon(Icons.lightbulb),
+                      icon: const Icon(Icons.lightbulb_outline),
                       label: const Text(
                         'Get AI Hint',
                         style: TextStyle(fontSize: 18),
                       ),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.amber,
-                        foregroundColor: Colors.black,
+                        backgroundColor: const Color(0xFF3A4454), // Cool Grey
+                        foregroundColor: const Color(0xFF00F5D4), // Electric Teal
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                       ),
                       onPressed: () {
                         context.read<GameProvider>().useHint();
@@ -96,9 +109,9 @@ class GameScreen extends StatelessWidget {
                     ),
                   ),
                   
-                  const SizedBox(height: 10), // Spacing between buttons
+                  const SizedBox(height: 10),
                   
-                  // --- NEW AUTO SOLVE BUTTON ---
+                  // Auto Solve Button
                   SizedBox(
                     width: double.infinity,
                     height: 50,
@@ -109,15 +122,17 @@ class GameScreen extends StatelessWidget {
                         style: TextStyle(fontSize: 18),
                       ),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.purple.shade400,
-                        foregroundColor: Colors.white,
+                        backgroundColor: const Color(0xFF3A4454), // Cool Grey
+                        foregroundColor: const Color(0xFFFF6B6B), // Neon Coral
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                       ),
                       onPressed: () {
                         context.read<GameProvider>().solveEntirePuzzle();
                       },
                     ),
                   ),
-                  // -----------------------------
                   
                   const SizedBox(height: 20),
                   const NumberPadWidget(),
@@ -132,27 +147,32 @@ class GameScreen extends StatelessWidget {
       context: context,
       barrierDismissible: false, // Prevent closing by tapping outside
       builder: (dialogContext) => AlertDialog(
+        backgroundColor: const Color(0xFF1E2640), // Muted Charcoal
         title: Text(
           isWon ? 'Tebrikler! 🎉' : 'Oyun Bitti ❌',
           style: TextStyle(
             fontWeight: FontWeight.bold,
-            color: isWon ? Colors.green : Colors.red,
+            color: isWon ? const Color(0xFF00F5D4) : const Color(0xFFFF6B6B),
           ),
         ),
         content: Text(
           isWon 
               ? 'Sudoku bulmacasını başarıyla çözdünüz!' 
               : '3 hata yaptığınız için oyunu kaybettiniz.',
-          style: const TextStyle(fontSize: 16),
+          style: const TextStyle(fontSize: 16, color: Color(0xFFF8FAFC)),
         ),
         actions: [
           TextButton(
             onPressed: () {
               // Main Menu action is left empty for now
             },
-            child: const Text('Ana Menü'),
+            child: const Text('Ana Menü', style: TextStyle(color: Color(0xFF94A3B8))),
           ),
           ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF3A4454),
+              foregroundColor: const Color(0xFFF8FAFC),
+            ),
             onPressed: () {
               Navigator.of(dialogContext).pop();
               if (isWon) {
