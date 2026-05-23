@@ -19,6 +19,9 @@ class _TicTacToeScreenState extends State<TicTacToeScreen> {
   // YENİ EKLENECEK DEĞİŞKENLER:
   int? selectedErrorRate; // null ise seçim ekranındayız, değer varsa oyun ekranındayız.
   String selectedDifficultyName = ""; // Ekranda hangi modda olduğumuzu yazmak için. // Yapay zeka motorumuzu başlattık
+  List<int> winningLine = [];
+  int playerScore = 0;
+  int aiScore = 0;
 
 void _makeMove(int index) async {
     // 1. KORUMA: Eğer hücre doluysa veya sıra sende değilse (AI düşünüyorsa) tıklamayı yoksay
@@ -93,18 +96,52 @@ void _makeMove(int index) async {
   void _resetGame() {
     setState(() {
       board = List.filled(9, ""); // Tahtayı temizle
-      isPlayerTurn = true;        // Sırayı tekrar oyuncuya (X) ver
+      isPlayerTurn = true;
+      winningLine = [];        
     });
   }
 
-  // Kazananı ekranda gösteren diyalog penceresi
-  void _showGameOverDialog(String winner) {
-    String title = "";
-    if (winner == "Draw") {
-      title = "Berabere!";
-    } else {
-      title = "$winner Kazandı!";
+  // Kazanan kombinasyonun indislerini bularak winningLine listesine kaydeder
+  void _setWinningLine() {
+    List<List<int>> winConditions = [
+      [0, 1, 2], [3, 4, 5], [6, 7, 8], // Yatay
+      [0, 3, 6], [1, 4, 7], [2, 5, 8], // Dikey
+      [0, 4, 8], [2, 4, 6]             // Çapraz
+    ];
+    
+    for (var condition in winConditions) {
+      String a = board[condition[0]];
+      // Eğer hücre boş değilse ve üçü de aynıysa kazanan çizgiyi bulduk demektir
+      if (a != "" && a == board[condition[1]] && a == board[condition[2]]) {
+        setState(() {
+          winningLine = condition; // Durumu güncelle ve arayüzü tetikle
+        });
+        break;
+      }
     }
+  }
+
+  // Kazananı ekranda gösteren diyalog penceresi
+void _showGameOverDialog(String winner) {
+    String title = "";
+    
+    // Hem skoru artırıyoruz hem de mesajı tek bir yerde belirliyoruz
+    setState(() {
+      if (winner == "Draw") {
+        title = "Berabere!";
+      } else if (winner == "X") {
+        title = "Sen Kazandın!";
+        playerScore++;
+      } else if (winner == "O") {
+        title = "AI Kazandı!";
+        aiScore++;
+      }
+      
+      // Kazanan varsa çizgiyi renklendir
+      if (winner != "Draw") {
+        _setWinningLine();
+      }
+    });
 
     showDialog(
       context: context,
@@ -189,15 +226,53 @@ Widget _buildSelectionScreen() {
     );
   }
 
-  Widget _buildGameScreen() {
+Widget _buildGameScreen() {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
+        // İŞTE YENİ SKOR TABLOMUZ
+        Container(
+          margin: const EdgeInsets.only(top: 20, bottom: 10),
+          padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+          decoration: BoxDecoration(
+            color: Colors.grey[800],
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.5),
+                blurRadius: 10,
+                offset: const Offset(0, 5),
+              ),
+            ],
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Column(
+                children: [
+                  const Text("SEN", style: TextStyle(color: Colors.blueAccent, fontSize: 16, fontWeight: FontWeight.bold)),
+                  Text("$playerScore", style: const TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold)),
+                ],
+              ),
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20.0),
+                child: Text("-", style: TextStyle(color: Colors.white54, fontSize: 32)),
+              ),
+              Column(
+                children: [
+                  const Text("AI", style: TextStyle(color: Colors.redAccent, fontSize: 16, fontWeight: FontWeight.bold)),
+                  Text("$aiScore", style: const TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold)),
+                ],
+              ),
+            ],
+          ),
+        ),
+
         // Sıra Göstergesi
         Padding(
           padding: const EdgeInsets.all(16.0),
           child: Text(
-            isPlayerTurn ? "Sıra: X" : "Sıra: AI",
+            isPlayerTurn ? "Sıra: Sen" : "Sıra: AI",
             style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
           ),
         ),
@@ -220,16 +295,23 @@ Widget _buildSelectionScreen() {
                   },
                   child: Container(
                     decoration: BoxDecoration(
-                      color: Colors.grey[800],
+                      color: winningLine.contains(index) ? Colors.green[700] : Colors.grey[800],
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Center(
-child: Text(
-                        board[index], // Koşulları sildik, sadece tahtadaki harfi (X veya O) basacak
-                        style: TextStyle(
-                          color: board[index] == "X" ? Colors.blueAccent : Colors.redAccent,
-                          fontSize: 60, // Soru işaretli koşulu sildik, tüm harfler aynı boy (60) olacak
-                          fontWeight: FontWeight.bold,
+                      child: AnimatedScale(
+                        // DURUM KONTROLÜ: Eğer hücre boşsa boyut 0'dır (görünmez). 
+                        // Hamle yapıldığı an otomatik olarak 1 (tam boy) boyutuna animasyonla büyür.
+                        scale: board[index] == "" ? 0.0 : 1.0,
+                        duration: const Duration(milliseconds: 300), // Animasyonun süresi (300 milisaniye)
+                        curve: Curves.bounceOut, // Sıçrama/Esneklik efekti veren eğri
+                        child: Text(
+                          board[index],
+                          style: TextStyle(
+                            color: board[index] == "X" ? Colors.blueAccent : Colors.redAccent, 
+                            fontSize: 60, 
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                     ),
@@ -247,6 +329,8 @@ child: Text(
             onPressed: () {
               setState(() {
                 selectedErrorRate = null; // null yaparak zorluk seçim ekranına dönüyoruz
+                playerScore = 0;
+                aiScore = 0;
                 _resetGame(); // Oyun tahtasını sıfırlıyoruz
               });
             },
