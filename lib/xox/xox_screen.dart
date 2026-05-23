@@ -167,46 +167,83 @@ void _showGameOverDialog(String winner) {
 
 Widget _buildSelectionScreen() {
     return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.start, // Üstten başlasın
       children: [
-        const Text(
-          "Zorluk Seviyesi Seç",
-          style: TextStyle(
-            color: Colors.white, 
-            fontSize: 28, 
-            fontWeight: FontWeight.bold
+        const SizedBox(height: 50), // Üstten biraz boşluk
+        
+        // --- 1. LOGO ENTEGRASYONU ---
+        // Assets'ten logomuzu çağırdık, yüksekliğini sabitledik
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 40.0),
+          child: Image.asset(
+            'assets/images/xox_logoo.png', 
+            height: 180, // Logoyu biraz büyük tutalım
+            fit: BoxFit.contain,
           ),
         ),
-        const SizedBox(height: 40),
+        const SizedBox(height: 30),
+
+        // --- 2. BAŞLIK VE AI VURGUSU ---
+        const Text(
+          "YAPAY ZEKA vs SEN",
+          style: TextStyle(
+            color: Colors.tealAccent, // Neon parlaklığı verelim
+            fontSize: 32, 
+            fontWeight: FontWeight.bold,
+            letterSpacing: 1.5, // Harfleri açalım
+          ),
+        ),
+        const SizedBox(height: 10),
+        Text(
+          "Kendi sınırlarını test et",
+          style: TextStyle(
+            color: Colors.white.withOpacity(0.6), // Hafif gri
+            fontSize: 16, 
+            fontStyle: FontStyle.italic,
+          ),
+        ),
+        
+        const SizedBox(height: 60), // Butonlarla ara
+
+        const Text(
+          "Zorluk Seviyesi Seç",
+          style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 20),
+        
+        // --- 3. PREMIUM BUTONLAR ---
+        // Mevcut buton fonksiyonlarımızı kullanıyoruz ama tasarımlarını cilaladık
         _difficultyButton("KOLAY", 60, Colors.green),
         _difficultyButton("ZOR", 30, Colors.orange),
         _difficultyButton("İMKANSIZ", 0, Colors.red),
-        const SizedBox(height: 60),
-        // Diğer dersle birleştiğinde kullanılacak "Ana Menüye Dön" butonu için yerimiz hazır
+        
+        const SizedBox(height: 40),
+        
+        // Diğer oyunlarla birleşince kullanılacak Ana Menü Butonu
         TextButton.icon(
-          onPressed: () { 
-            /* Navigator.pop(context); - Diğer oyunlarla birleşince açılacak */ 
-          },
+          onPressed: () { /* Navigator.pop(context); */ },
           icon: const Icon(Icons.arrow_back, color: Colors.tealAccent),
           label: const Text(
             "Ana Menüye Dön", 
             style: TextStyle(color: Colors.tealAccent)
           ),
         ),
+        const SizedBox(height: 20),
       ],
     );
   }
 
+  // --- PREMIUM BUTON TASARIMI (Güncelleme) ---
+  // Eski düz butonumuzu, koyu arka planlı ve renkli çerçeveli (Border) hale getirdik
   Widget _difficultyButton(String name, int rate, Color color) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 50),
-      child: ElevatedButton(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: color,
+      child: OutlinedButton( // ElevatedButton yerine OutlinedButton kullandık
+        style: OutlinedButton.styleFrom(
+          side: BorderSide(color: color, width: 2), // Renkli ince çerçeve
+          backgroundColor: color.withOpacity(0.1), // Çerçeve renginde çok hafif bir iç dolgu
           minimumSize: const Size(double.infinity, 60),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(15)
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
         ),
         onPressed: () {
           setState(() {
@@ -216,15 +253,17 @@ Widget _buildSelectionScreen() {
         },
         child: Text(
           name, 
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 20, 
             fontWeight: FontWeight.bold, 
-            color: Colors.white
+            color: color // Buton metnini de çerçeve renginde yapalım
           )
         ),
       ),
     );
   }
+
+
 
 Widget _buildGameScreen() {
     return Column(
