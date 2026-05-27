@@ -14,7 +14,7 @@ class ConnectFourApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Connect Four',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        fontFamily: 'Roboto', // Varsa projene uygun havalı bir font ekleyebilirsin
       ),
       home: const GameScreen(),
     );
@@ -29,6 +29,15 @@ class GameScreen extends StatefulWidget {
 }
 
 class _GameScreenState extends State<GameScreen> {
+  // --- RENK PALETİ ---
+  final Color bgDeepSlate = const Color(0xFF121826);
+  final Color boardCharcoal = const Color(0xFF1E2640);
+  final Color gridGrey = const Color(0xFF3A4454);
+  final Color p1Coral = const Color(0xFFFF6B6B);
+  final Color p2Teal = const Color(0xFF00F5D4);
+  final Color textOffWhite = const Color(0xFFF8FAFC);
+  final Color textSlate = const Color(0xFF94A3B8);
+
   List<List<int>> board = List.generate(6, (_) => List.generate(7, (_) => 0));
   
   int currentPlayer = 1; 
@@ -37,6 +46,9 @@ class _GameScreenState extends State<GameScreen> {
   
   bool isAiThinking = false;
   late ConnectFourAI ai; 
+
+  // Kazanan pulların indekslerini (satır * 7 + sütun) tutacağımız liste
+  List<int> winPath = []; 
 
   void _startGame(int selectedColor) {
     setState(() {
@@ -57,6 +69,7 @@ class _GameScreenState extends State<GameScreen> {
       playerColor = null;
       isGameOver = false;
       isAiThinking = false;
+      winPath.clear(); // Yeni oyunda parıltıları sıfırla
     });
   }
 
@@ -68,7 +81,7 @@ class _GameScreenState extends State<GameScreen> {
   void _makeAiMove() async {
     setState(() { isAiThinking = true; }); 
 
-    await Future.delayed(const Duration(milliseconds: 500));
+    await Future.delayed(const Duration(milliseconds: 600));
     AiMove bestMove = ai.getBestMove(board, 5, -99999999, 99999999, true);
 
     setState(() { isAiThinking = false; }); 
@@ -87,11 +100,18 @@ class _GameScreenState extends State<GameScreen> {
           if (_checkWinner(currentPlayer)) {
             isGameOver = true;
             String winnerText = currentPlayer == playerColor ? 'Tebrikler, Kazandın!' : 'Yapay Zeka Kazandı!';
-            Color winnerColor = currentPlayer == 1 ? Colors.red : Colors.yellow[800]!;
-            _showGameOverDialog(winnerText, winnerColor);
+            Color winnerColor = currentPlayer == 1 ? p1Coral : p2Teal;
+            
+            // Kazanma animasyonunun görünmesi için dialog'u biraz geciktiriyoruz
+            Future.delayed(const Duration(milliseconds: 800), () {
+              _showGameOverDialog(winnerText, winnerColor);
+            });
+            
           } else if (_checkDraw()) {
             isGameOver = true;
-            _showGameOverDialog('Oyun Berabere!', Colors.blue);
+            Future.delayed(const Duration(milliseconds: 800), () {
+              _showGameOverDialog('Oyun Berabere!', textOffWhite);
+            });
           } else {
             currentPlayer = currentPlayer == 1 ? 2 : 1;
             
@@ -105,25 +125,44 @@ class _GameScreenState extends State<GameScreen> {
     }
   }
 
+  // Kazanma durumunu kontrol ederken aynı zamanda kazanan koordinatları kaydederiz
   bool _checkWinner(int player) {
+    winPath.clear(); 
+
+    // Yatay Kontrol
     for (int r = 0; r < 6; r++) {
       for (int c = 0; c < 4; c++) {
-        if (board[r][c] == player && board[r][c + 1] == player && board[r][c + 2] == player && board[r][c + 3] == player) return true;
+        if (board[r][c] == player && board[r][c + 1] == player && board[r][c + 2] == player && board[r][c + 3] == player) {
+          winPath = [r * 7 + c, r * 7 + (c + 1), r * 7 + (c + 2), r * 7 + (c + 3)];
+          return true;
+        }
       }
     }
+    // Dikey Kontrol
     for (int r = 0; r < 3; r++) {
       for (int c = 0; c < 7; c++) {
-        if (board[r][c] == player && board[r + 1][c] == player && board[r + 2][c] == player && board[r + 3][c] == player) return true;
+        if (board[r][c] == player && board[r + 1][c] == player && board[r + 2][c] == player && board[r + 3][c] == player) {
+          winPath = [r * 7 + c, (r + 1) * 7 + c, (r + 2) * 7 + c, (r + 3) * 7 + c];
+          return true;
+        }
       }
     }
+    // Sağ Aşağı Çapraz
     for (int r = 0; r < 3; r++) {
       for (int c = 0; c < 4; c++) {
-        if (board[r][c] == player && board[r + 1][c + 1] == player && board[r + 2][c + 2] == player && board[r + 3][c + 3] == player) return true;
+        if (board[r][c] == player && board[r + 1][c + 1] == player && board[r + 2][c + 2] == player && board[r + 3][c + 3] == player) {
+          winPath = [r * 7 + c, (r + 1) * 7 + (c + 1), (r + 2) * 7 + (c + 2), (r + 3) * 7 + (c + 3)];
+          return true;
+        }
       }
     }
+    // Sağ Yukarı Çapraz
     for (int r = 3; r < 6; r++) {
       for (int c = 0; c < 4; c++) {
-        if (board[r][c] == player && board[r - 1][c + 1] == player && board[r - 2][c + 2] == player && board[r - 3][c + 3] == player) return true;
+        if (board[r][c] == player && board[r - 1][c + 1] == player && board[r - 2][c + 2] == player && board[r - 3][c + 3] == player) {
+          winPath = [r * 7 + c, (r - 1) * 7 + (c + 1), (r - 2) * 7 + (c + 2), (r - 3) * 7 + (c + 3)];
+          return true;
+        }
       }
     }
     return false;
@@ -144,15 +183,16 @@ class _GameScreenState extends State<GameScreen> {
       barrierDismissible: false, 
       builder: (context) {
         return AlertDialog(
+          backgroundColor: boardCharcoal,
           title: Text(title, style: TextStyle(color: color, fontWeight: FontWeight.bold)),
-          content: const Text('Yeni bir oyun başlatmak ister misin?'),
+          content: Text('Yeni bir oyun başlatmak ister misin?', style: TextStyle(color: textSlate)),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop(); 
                 _resetGame(); 
               },
-              child: const Text('Tekrar Oyna'),
+              child: Text('Tekrar Oyna', style: TextStyle(color: textOffWhite)),
             ),
           ],
         );
@@ -163,18 +203,19 @@ class _GameScreenState extends State<GameScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[200],
+      backgroundColor: bgDeepSlate, // Ana Arka Plan
       appBar: AppBar(
-        title: const Text(
+        title: Text(
           'Connect Four',
-          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+          style: TextStyle(fontWeight: FontWeight.bold, color: textOffWhite),
         ),
-        backgroundColor: Colors.blue[900],
+        backgroundColor: bgDeepSlate,
+        elevation: 0, // Düz ve modern bir üst menü için gölgeyi kaldırdık
         centerTitle: true,
         actions: [
           if (playerColor != null)
             IconButton(
-              icon: const Icon(Icons.refresh, color: Colors.white),
+              icon: Icon(Icons.refresh, color: textSlate),
               onPressed: _resetGame,
               tooltip: 'Oyunu Sıfırla',
             ),
@@ -189,9 +230,9 @@ class _GameScreenState extends State<GameScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Text(
-            'Tarafını Seç!',
-            style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: Colors.black87),
+          Text(
+            'Tarafını Seç',
+            style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: textOffWhite),
           ),
           const SizedBox(height: 50),
           Row(
@@ -202,10 +243,12 @@ class _GameScreenState extends State<GameScreen> {
                 child: Container(
                   width: 100,
                   height: 100,
-                  decoration: const BoxDecoration(
-                    color: Colors.red,
+                  decoration: BoxDecoration(
+                    color: p1Coral,
                     shape: BoxShape.circle,
-                    boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 8, offset: Offset(0, 4))],
+                    boxShadow: [
+                      BoxShadow(color: p1Coral.withOpacity(0.5), blurRadius: 15, spreadRadius: 2)
+                    ],
                   ),
                 ),
               ),
@@ -215,10 +258,12 @@ class _GameScreenState extends State<GameScreen> {
                 child: Container(
                   width: 100,
                   height: 100,
-                  decoration: const BoxDecoration(
-                    color: Colors.yellow,
+                  decoration: BoxDecoration(
+                    color: p2Teal,
                     shape: BoxShape.circle,
-                    boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 8, offset: Offset(0, 4))],
+                    boxShadow: [
+                      BoxShadow(color: p2Teal.withOpacity(0.5), blurRadius: 15, spreadRadius: 2)
+                    ],
                   ),
                 ),
               ),
@@ -235,13 +280,13 @@ class _GameScreenState extends State<GameScreen> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Padding(
-            padding: const EdgeInsets.only(bottom: 16.0),
+            padding: const EdgeInsets.only(bottom: 24.0),
             child: Text(
               currentPlayer == playerColor ? 'Senin Sıran' : 'Yapay Zeka Düşünüyor...',
               style: TextStyle(
-                fontSize: 24, 
-                fontWeight: FontWeight.bold,
-                color: currentPlayer == 1 ? Colors.red : Colors.yellow[700],
+                fontSize: 22, 
+                fontWeight: FontWeight.w600,
+                color: currentPlayer == 1 ? p1Coral : p2Teal,
               ),
             ),
           ),
@@ -255,9 +300,12 @@ class _GameScreenState extends State<GameScreen> {
                   height: 656,
                   padding: const EdgeInsets.all(8.0),
                   decoration: BoxDecoration(
-                    color: Colors.blue[700],
+                    color: boardCharcoal, // Oyun Alanı
+                    border: Border.all(color: gridGrey, width: 2), // İnce bir çerçeve
                     borderRadius: BorderRadius.circular(16.0),
-                    boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 10, offset: Offset(0, 5))],
+                    boxShadow: const [
+                      BoxShadow(color: Colors.black45, blurRadius: 15, offset: Offset(0, 8))
+                    ],
                   ),
                   child: GridView.builder(
                     physics: const NeverScrollableScrollPhysics(),
@@ -271,6 +319,9 @@ class _GameScreenState extends State<GameScreen> {
                       int row = index ~/ 7;
                       int col = index % 7;
                       int cellValue = board[row][col];
+                      
+                      // Bu hücre kazanan dörtlüden biri mi?
+                      bool isWinningPiece = winPath.contains(index);
 
                       return GestureDetector(
                         onTap: () {
@@ -278,12 +329,20 @@ class _GameScreenState extends State<GameScreen> {
                         },
                         child: cellValue == 0
                             ? Container(
-                                decoration: const BoxDecoration(
-                                  color: Colors.white,
+                                decoration: BoxDecoration(
+                                  color: bgDeepSlate, // Boşluklar arkaplanı gösterir
                                   shape: BoxShape.circle,
+                                  border: Border.all(color: gridGrey.withOpacity(0.3), width: 1), // Yuvaları belli eden çok hafif çizgi
                                 ),
                               )
-                            : AnimatedPiece(player: cellValue, row: row),
+                            : AnimatedPiece(
+                                player: cellValue, 
+                                row: row, 
+                                isWinningPiece: isWinningPiece,
+                                colorP1: p1Coral,
+                                colorP2: p2Teal,
+                                glowColor: textOffWhite,
+                              ),
                       );
                     },
                   ),
@@ -300,11 +359,25 @@ class _GameScreenState extends State<GameScreen> {
 class AnimatedPiece extends StatelessWidget {
   final int player;
   final int row; 
+  final bool isWinningPiece;
+  final Color colorP1;
+  final Color colorP2;
+  final Color glowColor;
 
-  const AnimatedPiece({super.key, required this.player, required this.row});
+  const AnimatedPiece({
+    super.key, 
+    required this.player, 
+    required this.row,
+    required this.isWinningPiece,
+    required this.colorP1,
+    required this.colorP2,
+    required this.glowColor,
+  });
 
   @override
   Widget build(BuildContext context) {
+    Color pieceColor = player == 1 ? colorP1 : colorP2;
+
     return TweenAnimationBuilder<Offset>(
       duration: Duration(milliseconds: 400 + (row * 80)), 
       curve: Curves.bounceOut, 
@@ -320,8 +393,30 @@ class AnimatedPiece extends StatelessWidget {
       },
       child: Container(
         decoration: BoxDecoration(
-          color: player == 1 ? Colors.red : Colors.yellow,
+          color: pieceColor,
           shape: BoxShape.circle,
+          boxShadow: isWinningPiece 
+              ? [
+                  // Kazanan taşlara uygulanan Off-White parıltı (Glow Efekti)
+                  BoxShadow(
+                    color: glowColor.withOpacity(0.8),
+                    blurRadius: 20,
+                    spreadRadius: 4,
+                  ),
+                  BoxShadow(
+                    color: pieceColor, // Kendi rengiyle desteklenen iç parıltı
+                    blurRadius: 10,
+                    spreadRadius: 1,
+                  )
+                ]
+              : [
+                  // Normal taşların standart gölgesi
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.3),
+                    blurRadius: 4,
+                    offset: const Offset(0, 3),
+                  )
+                ],
         ),
       ),
     );
