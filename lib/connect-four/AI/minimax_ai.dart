@@ -60,6 +60,32 @@ class ConnectFourAI {
     return score;
   }
 
+  List<int> getTopTwoMoves(List<List<int>> board) {
+    List<int> validLocations = _getValidLocations(board);
+    List<AiMove> moves = [];
+
+    
+    for (int col in validLocations) {
+      List<List<int>> bCopy = _copyBoard(board);
+      _dropPiece(bCopy, col, playerPiece); 
+      
+      int score = 0;
+      
+      if (_checkWinningMove(bCopy, playerPiece)) {
+        score = 100000; 
+      } else {
+       
+        score = _scorePosition(bCopy, playerPiece);
+      }
+      moves.add(AiMove(column: col, score: score));
+    }
+
+    
+    moves.sort((a, b) => b.score.compareTo(a.score));
+
+    
+    return moves.take(2).map((m) => m.column).toList();
+  }
   int _scorePosition(List<List<int>> board, int piece) {
     int score = 0;
 

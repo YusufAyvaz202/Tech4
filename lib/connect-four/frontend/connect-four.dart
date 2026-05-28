@@ -14,7 +14,7 @@ class ConnectFourApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Connect Four',
       theme: ThemeData(
-        fontFamily: 'Roboto', // Varsa projene uygun havalı bir font ekleyebilirsin
+        fontFamily: 'Roboto', 
       ),
       home: const GameScreen(),
     );
@@ -29,7 +29,6 @@ class GameScreen extends StatefulWidget {
 }
 
 class _GameScreenState extends State<GameScreen> {
-  // --- RENK PALETİ ---
   final Color bgDeepSlate = const Color(0xFF121826);
   final Color boardCharcoal = const Color(0xFF1E2640);
   final Color gridGrey = const Color(0xFF3A4454);
@@ -47,8 +46,8 @@ class _GameScreenState extends State<GameScreen> {
   bool isAiThinking = false;
   late ConnectFourAI ai; 
 
-  // Kazanan pulların indekslerini (satır * 7 + sütun) tutacağımız liste
   List<int> winPath = []; 
+  List<int> hintColumns = []; 
 
   void _startGame(int selectedColor) {
     setState(() {
@@ -69,12 +68,18 @@ class _GameScreenState extends State<GameScreen> {
       playerColor = null;
       isGameOver = false;
       isAiThinking = false;
-      winPath.clear(); // Yeni oyunda parıltıları sıfırla
+      winPath.clear(); 
+      hintColumns.clear(); 
     });
   }
 
   void _handleTap(int col) {
     if (isGameOver || isAiThinking || currentPlayer != playerColor) return;
+    
+    setState(() {
+      hintColumns.clear(); 
+    });
+    
     _processDrop(col);
   }
 
@@ -102,7 +107,6 @@ class _GameScreenState extends State<GameScreen> {
             String winnerText = currentPlayer == playerColor ? 'Tebrikler, Kazandın!' : 'Yapay Zeka Kazandı!';
             Color winnerColor = currentPlayer == 1 ? p1Coral : p2Teal;
             
-            // Kazanma animasyonunun görünmesi için dialog'u biraz geciktiriyoruz
             Future.delayed(const Duration(milliseconds: 800), () {
               _showGameOverDialog(winnerText, winnerColor);
             });
@@ -125,11 +129,10 @@ class _GameScreenState extends State<GameScreen> {
     }
   }
 
-  // Kazanma durumunu kontrol ederken aynı zamanda kazanan koordinatları kaydederiz
   bool _checkWinner(int player) {
     winPath.clear(); 
 
-    // Yatay Kontrol
+    
     for (int r = 0; r < 6; r++) {
       for (int c = 0; c < 4; c++) {
         if (board[r][c] == player && board[r][c + 1] == player && board[r][c + 2] == player && board[r][c + 3] == player) {
@@ -138,7 +141,7 @@ class _GameScreenState extends State<GameScreen> {
         }
       }
     }
-    // Dikey Kontrol
+    
     for (int r = 0; r < 3; r++) {
       for (int c = 0; c < 7; c++) {
         if (board[r][c] == player && board[r + 1][c] == player && board[r + 2][c] == player && board[r + 3][c] == player) {
@@ -147,7 +150,7 @@ class _GameScreenState extends State<GameScreen> {
         }
       }
     }
-    // Sağ Aşağı Çapraz
+    
     for (int r = 0; r < 3; r++) {
       for (int c = 0; c < 4; c++) {
         if (board[r][c] == player && board[r + 1][c + 1] == player && board[r + 2][c + 2] == player && board[r + 3][c + 3] == player) {
@@ -156,7 +159,7 @@ class _GameScreenState extends State<GameScreen> {
         }
       }
     }
-    // Sağ Yukarı Çapraz
+   
     for (int r = 3; r < 6; r++) {
       for (int c = 0; c < 4; c++) {
         if (board[r][c] == player && board[r - 1][c + 1] == player && board[r - 2][c + 2] == player && board[r - 3][c + 3] == player) {
@@ -175,6 +178,14 @@ class _GameScreenState extends State<GameScreen> {
       }
     }
     return true; 
+  }
+
+  
+  int _getEmptyRow(int col) {
+    for (int r = 5; r >= 0; r--) {
+      if (board[r][col] == 0) return r;
+    }
+    return -1;
   }
 
   void _showGameOverDialog(String title, Color color) {
@@ -203,16 +214,27 @@ class _GameScreenState extends State<GameScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: bgDeepSlate, // Ana Arka Plan
+      backgroundColor: bgDeepSlate, 
       appBar: AppBar(
         title: Text(
           'Connect Four',
           style: TextStyle(fontWeight: FontWeight.bold, color: textOffWhite),
         ),
         backgroundColor: bgDeepSlate,
-        elevation: 0, // Düz ve modern bir üst menü için gölgeyi kaldırdık
+        elevation: 0, 
         centerTitle: true,
         actions: [
+          if (playerColor != null)
+            IconButton(
+              icon: const Icon(Icons.lightbulb_outline, color: Colors.yellowAccent),
+              onPressed: () {
+                if (isGameOver || isAiThinking || currentPlayer != playerColor) return;
+                setState(() {
+                  hintColumns = ai.getTopTwoMoves(board);
+                });
+              },
+              tooltip: 'İpucu Al',
+            ),
           if (playerColor != null)
             IconButton(
               icon: Icon(Icons.refresh, color: textSlate),
@@ -300,8 +322,8 @@ class _GameScreenState extends State<GameScreen> {
                   height: 656,
                   padding: const EdgeInsets.all(8.0),
                   decoration: BoxDecoration(
-                    color: boardCharcoal, // Oyun Alanı
-                    border: Border.all(color: gridGrey, width: 2), // İnce bir çerçeve
+                    color: boardCharcoal, 
+                    border: Border.all(color: gridGrey, width: 2), 
                     borderRadius: BorderRadius.circular(16.0),
                     boxShadow: const [
                       BoxShadow(color: Colors.black45, blurRadius: 15, offset: Offset(0, 8))
@@ -320,8 +342,8 @@ class _GameScreenState extends State<GameScreen> {
                       int col = index % 7;
                       int cellValue = board[row][col];
                       
-                      // Bu hücre kazanan dörtlüden biri mi?
                       bool isWinningPiece = winPath.contains(index);
+                      bool isHinted = hintColumns.contains(col) && row == _getEmptyRow(col);
 
                       return GestureDetector(
                         onTap: () {
@@ -330,10 +352,19 @@ class _GameScreenState extends State<GameScreen> {
                         child: cellValue == 0
                             ? Container(
                                 decoration: BoxDecoration(
-                                  color: bgDeepSlate, // Boşluklar arkaplanı gösterir
+                                  color: bgDeepSlate, 
                                   shape: BoxShape.circle,
-                                  border: Border.all(color: gridGrey.withOpacity(0.3), width: 1), // Yuvaları belli eden çok hafif çizgi
+                                  border: Border.all(
+                                    color: isHinted ? Colors.yellowAccent : gridGrey.withOpacity(0.3), 
+                                    width: isHinted ? 3 : 1
+                                  ),
+                                  boxShadow: isHinted 
+                                      ? [BoxShadow(color: Colors.yellowAccent.withOpacity(0.4), blurRadius: 12, spreadRadius: 2)] 
+                                      : [],
                                 ),
+                                child: isHinted 
+                                    ? Icon(Icons.flare, color: Colors.yellowAccent.withOpacity(0.8), size: 24)
+                                    : null,
                               )
                             : AnimatedPiece(
                                 player: cellValue, 
@@ -397,20 +428,18 @@ class AnimatedPiece extends StatelessWidget {
           shape: BoxShape.circle,
           boxShadow: isWinningPiece 
               ? [
-                  // Kazanan taşlara uygulanan Off-White parıltı (Glow Efekti)
                   BoxShadow(
                     color: glowColor.withOpacity(0.8),
                     blurRadius: 20,
                     spreadRadius: 4,
                   ),
                   BoxShadow(
-                    color: pieceColor, // Kendi rengiyle desteklenen iç parıltı
+                    color: pieceColor, 
                     blurRadius: 10,
                     spreadRadius: 1,
                   )
                 ]
               : [
-                  // Normal taşların standart gölgesi
                   BoxShadow(
                     color: Colors.black.withOpacity(0.3),
                     blurRadius: 4,
