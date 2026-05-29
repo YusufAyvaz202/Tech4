@@ -42,17 +42,15 @@ class _MazeEscapeScreenState extends State<MazeEscapeScreen> {
             Text('Tebrikler!'),
           ],
         ),
-        // Sadece bir Text yerine alt alta elemanlar dizebilmek için Column kullandık
         content: Column(
-          mainAxisSize: MainAxisSize.min, // İçeriği sıkıştırır, ekranı kaplamasını engeller
+          mainAxisSize: MainAxisSize.min, 
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               'Labirenti ${_controller.currentSteps} adımda başarıyla tamamladın!',
               style: const TextStyle(fontSize: 16),
             ),
-            const SizedBox(height: 16), // Araya biraz boşluk
-            // Yapay Zeka Karşılaştırma Kutusu
+            const SizedBox(height: 16), 
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
@@ -96,6 +94,18 @@ class _MazeEscapeScreenState extends State<MazeEscapeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.home, color: Colors.white),
+          tooltip: 'Ana Menüye Dön',
+          onPressed: () {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Ana Menü modülü henüz entegre edilmedi.'),
+                duration: Duration(seconds: 2),
+              ),
+            );
+          },
+        ),
         title: const Text('Labirent Kaçış'),
         backgroundColor: Colors.blueGrey,
         actions: [
