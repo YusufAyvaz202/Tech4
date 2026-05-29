@@ -22,6 +22,14 @@ class _TicTacToeScreenState extends State<TicTacToeScreen> {
   List<int> winningLine = [];
   int playerScore = 0;
   int aiScore = 0;
+  // --- YENİ TEMA RENK PALETİ ---
+  final Color deepSlate = const Color(0xFF121826);
+  final Color mutedCharcoal = const Color(0xFF1E2640);
+  final Color coolGrey = const Color(0xFF3A4454);
+  final Color neonCoral = const Color(0xFFFF6B6B);
+  final Color electricTeal = const Color(0xFF00F5D4);
+  final Color offWhite = const Color(0xFFF8FAFC);
+  final Color slateGrey = const Color(0xFF94A3B8);
 
 void _makeMove(int index) async {
     // 1. KORUMA: Eğer hücre doluysa veya sıra sende değilse (AI düşünüyorsa) tıklamayı yoksay
@@ -167,66 +175,45 @@ void _showGameOverDialog(String winner) {
 
 Widget _buildSelectionScreen() {
     return Column(
-      mainAxisAlignment: MainAxisAlignment.start, // Üstten başlasın
+      mainAxisAlignment: MainAxisAlignment.start,
       children: [
-        const SizedBox(height: 50), // Üstten biraz boşluk
+        const SizedBox(height: 50),
         
-        // --- 1. LOGO ENTEGRASYONU ---
-        // Assets'ten logomuzu çağırdık, yüksekliğini sabitledik
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 40.0),
-          child: Image.asset(
-            'assets/images/xox_logoo.png', 
-            height: 180, // Logoyu biraz büyük tutalım
-            fit: BoxFit.contain,
-          ),
+          child: Image.asset('assets/images/xox_logoo.png', height: 180, fit: BoxFit.contain),
         ),
         const SizedBox(height: 30),
 
-        // --- 2. BAŞLIK VE AI VURGUSU ---
-        const Text(
+        Text(
           "YAPAY ZEKA vs SEN",
-          style: TextStyle(
-            color: Colors.tealAccent, // Neon parlaklığı verelim
-            fontSize: 32, 
-            fontWeight: FontWeight.bold,
-            letterSpacing: 1.5, // Harfleri açalım
-          ),
+          style: TextStyle(color: offWhite, fontSize: 32, fontWeight: FontWeight.bold, letterSpacing: 1.5),
         ),
         const SizedBox(height: 10),
         Text(
           "Kendi sınırlarını test et",
-          style: TextStyle(
-            color: Colors.white.withOpacity(0.6), // Hafif gri
-            fontSize: 16, 
-            fontStyle: FontStyle.italic,
-          ),
+          style: TextStyle(color: slateGrey, fontSize: 16, fontStyle: FontStyle.italic),
         ),
         
-        const SizedBox(height: 60), // Butonlarla ara
+        const SizedBox(height: 60),
 
-        const Text(
+        Text(
           "Zorluk Seviyesi Seç",
-          style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold),
+          style: TextStyle(color: offWhite, fontSize: 22, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 20),
         
-        // --- 3. PREMIUM BUTONLAR ---
-        // Mevcut buton fonksiyonlarımızı kullanıyoruz ama tasarımlarını cilaladık
-        _difficultyButton("KOLAY", 60, Colors.green),
-        _difficultyButton("ZOR", 30, Colors.orange),
-        _difficultyButton("İMKANSIZ", 0, Colors.red),
+        // Buton renklerini yeni temamıza uyarladık
+        _difficultyButton("KOLAY", 60, electricTeal),
+        _difficultyButton("ZOR", 30, slateGrey),
+        _difficultyButton("İMKANSIZ", 0, neonCoral),
         
         const SizedBox(height: 40),
         
-        // Diğer oyunlarla birleşince kullanılacak Ana Menü Butonu
         TextButton.icon(
           onPressed: () { /* Navigator.pop(context); */ },
-          icon: const Icon(Icons.arrow_back, color: Colors.tealAccent),
-          label: const Text(
-            "Ana Menüye Dön", 
-            style: TextStyle(color: Colors.tealAccent)
-          ),
+          icon: Icon(Icons.arrow_back, color: slateGrey),
+          label: Text("Ana Menüye Dön", style: TextStyle(color: slateGrey)),
         ),
         const SizedBox(height: 20),
       ],
@@ -235,13 +222,13 @@ Widget _buildSelectionScreen() {
 
   // --- PREMIUM BUTON TASARIMI (Güncelleme) ---
   // Eski düz butonumuzu, koyu arka planlı ve renkli çerçeveli (Border) hale getirdik
-  Widget _difficultyButton(String name, int rate, Color color) {
+Widget _difficultyButton(String name, int rate, Color color) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 50),
-      child: OutlinedButton( // ElevatedButton yerine OutlinedButton kullandık
+      child: OutlinedButton( 
         style: OutlinedButton.styleFrom(
-          side: BorderSide(color: color, width: 2), // Renkli ince çerçeve
-          backgroundColor: color.withOpacity(0.1), // Çerçeve renginde çok hafif bir iç dolgu
+          side: BorderSide(color: color, width: 2), 
+          backgroundColor: color.withOpacity(0.1), 
           minimumSize: const Size(double.infinity, 60),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
         ),
@@ -253,11 +240,7 @@ Widget _buildSelectionScreen() {
         },
         child: Text(
           name, 
-          style: TextStyle(
-            fontSize: 20, 
-            fontWeight: FontWeight.bold, 
-            color: color // Buton metnini de çerçeve renginde yapalım
-          )
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: color)
         ),
       ),
     );
@@ -266,118 +249,191 @@ Widget _buildSelectionScreen() {
 
 
 Widget _buildGameScreen() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        // İŞTE YENİ SKOR TABLOMUZ
-        Container(
-          margin: const EdgeInsets.only(top: 20, bottom: 10),
-          padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
-          decoration: BoxDecoration(
-            color: Colors.grey[800],
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.5),
-                blurRadius: 10,
-                offset: const Offset(0, 5),
-              ),
-            ],
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Column(
-                children: [
-                  const Text("SEN", style: TextStyle(color: Colors.blueAccent, fontSize: 16, fontWeight: FontWeight.bold)),
-                  Text("$playerScore", style: const TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold)),
-                ],
-              ),
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 20.0),
-                child: Text("-", style: TextStyle(color: Colors.white54, fontSize: 32)),
-              ),
-              Column(
-                children: [
-                  const Text("AI", style: TextStyle(color: Colors.redAccent, fontSize: 16, fontWeight: FontWeight.bold)),
-                  Text("$aiScore", style: const TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold)),
-                ],
-              ),
-            ],
-          ),
-        ),
-
-        // Sıra Göstergesi
-        Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Text(
-            isPlayerTurn ? "Sıra: Sen" : "Sıra: AI",
-            style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
-          ),
-        ),
+    Color modeColor = selectedDifficultyName == "İMKANSIZ" 
+        ? neonCoral 
+        : (selectedDifficultyName == "KOLAY" ? electricTeal : slateGrey);
         
-        // 3x3 Oyun Tahtası
-        Expanded(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: GridView.builder(
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 3,
-                crossAxisSpacing: 8,
-                mainAxisSpacing: 8,
-              ),
-              itemCount: 9,
-              itemBuilder: (context, index) {
-                return GestureDetector(
-                  onTap: () {
-                    _makeMove(index);
-                  },
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: winningLine.contains(index) ? Colors.green[700] : Colors.grey[800],
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Center(
-                      child: AnimatedScale(
-                        // DURUM KONTROLÜ: Eğer hücre boşsa boyut 0'dır (görünmez). 
-                        // Hamle yapıldığı an otomatik olarak 1 (tam boy) boyutuna animasyonla büyür.
-                        scale: board[index] == "" ? 0.0 : 1.0,
-                        duration: const Duration(milliseconds: 300), // Animasyonun süresi (300 milisaniye)
-                        curve: Curves.bounceOut, // Sıçrama/Esneklik efekti veren eğri
-                        child: Text(
-                          board[index],
-                          style: TextStyle(
-                            color: board[index] == "X" ? Colors.blueAccent : Colors.redAccent, 
-                            fontSize: 60, 
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
+    return SizedBox(
+      width: double.infinity, // Sütunun ekranın %100 genişliğini kaplamasını zorunlu kılar
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center, // Yatayda her şeyi tam ortaya hizalar
+        children: [
+          // --- BAŞLIK VE DİNAMİK MOD ROZETİ ---
+          Padding(
+            padding: const EdgeInsets.only(top: 10.0, bottom: 20.0),
+            child: Column(
+              children: [
+                // 1. Oyun Adı (Şık ve ayrık harfler)
+                Text(
+                  "TIC-TAC-TOE",
+                  style: TextStyle(
+                    color: offWhite,
+                    fontSize: 28,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 4.0, // Harflerin arasını havalı durması için açtık
+                  ),
+                ),
+                const SizedBox(height: 10),
+                // 2. Mod Rozeti (Seçilen zorluğa göre renk değiştiren çerçeve)
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: mutedCharcoal,
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: modeColor, width: 1.5),
+                  ),
+                  child: Text(
+                    "MOD: $selectedDifficultyName",
+                    style: TextStyle(
+                      color: modeColor,
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 1.5,
                     ),
                   ),
-                );
-              },
+                ),
+              ],
             ),
           ),
-        ),
-
-        // İŞTE YENİ "ZORLUK SEÇİMİNE DÖN" BUTONUMUZ
-        Padding(
-          padding: const EdgeInsets.only(bottom: 20.0), 
-          child: TextButton.icon(
-            onPressed: () {
-              setState(() {
-                selectedErrorRate = null; // null yaparak zorluk seçim ekranına dönüyoruz
-                playerScore = 0;
-                aiScore = 0;
-                _resetGame(); // Oyun tahtasını sıfırlıyoruz
-              });
-            },
-            icon: const Icon(Icons.settings_backup_restore, color: Colors.tealAccent),
-            label: const Text("Zorluk Seçimine Dön", style: TextStyle(color: Colors.tealAccent)),
+          
+          // --- TEMATİK SKOR TABLOSU (Hizalama Düzeltildi) ---
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+            decoration: BoxDecoration(
+              color: mutedCharcoal, 
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: coolGrey, width: 2), 
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.2), 
+                  blurRadius: 20, 
+                  offset: const Offset(0, 10)
+                ),
+              ],
+            ),
+            // Yamukluğu önlemek için Sütunlar (Column) yerine Satırları (Row) alt alta dizdik
+            child: Column(
+              children: [
+                // 1. SATIR: İSİMLER
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text("SEN", style: TextStyle(color: neonCoral, fontSize: 16, fontWeight: FontWeight.bold)),
+                    const SizedBox(width: 50), // İsimlerin aralığı
+                    Text("AI", style: TextStyle(color: electricTeal, fontSize: 16, fontWeight: FontWeight.bold)),
+                  ],
+                ),
+                const SizedBox(height: 5), // İsimler ve rakamlar arası minik boşluk
+                // 2. SATIR: SKORLAR
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text("$playerScore", style: TextStyle(color: offWhite, fontSize: 32, fontWeight: FontWeight.bold)),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                      child: Text("-", style: TextStyle(color: slateGrey, fontSize: 32, fontWeight: FontWeight.bold)),
+                    ),
+                    Text("$aiScore", style: TextStyle(color: offWhite, fontSize: 32, fontWeight: FontWeight.bold)),
+                  ],
+                ),
+              ],
+            ),
           ),
-        ),
-      ],
+
+          // Sıra Göstergesi
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Text(
+              isPlayerTurn ? "Sıra: Sen" : "Sıra: AI",
+              style: TextStyle(color: offWhite, fontSize: 24, fontWeight: FontWeight.bold),
+            ),
+          ),
+          
+          // --- 3x3 OYUN TAHTASI (Muted Charcoal Kart ve Cool Grey Izgara) ---
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(24.0), // Dışarıdan şık bir boşluk
+              child: AspectRatio(
+                aspectRatio: 1.0, // Tahtanın tam bir kare kart olmasını garanti ediyoruz
+                child: Container(
+                  padding: const EdgeInsets.all(4), // Dış çerçevenin Cool Grey inceliği (ızgara çizgileri zemini)
+                  decoration: BoxDecoration(
+                    color: coolGrey, // Izgara çizgilerinin rengi (Zemin)
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      // Zeminle uyumlu ama belirgin bir gölge
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.4),
+                        blurRadius: 15,
+                        offset: const Offset(0, 8), 
+                      ),
+                    ],
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(16), // İç hücrelerin taşmasını engeller
+                    child: GridView.builder(
+                      physics: const NeverScrollableScrollPhysics(), // Kaydırmayı kapatıyoruz
+                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 3,
+                        crossAxisSpacing: 6, // Yatay Cool Grey çizgilerin kalınlığı
+                        mainAxisSpacing: 6,  // Dikey Cool Grey çizgilerin kalınlığı
+                      ),
+                      itemCount: 9,
+                      itemBuilder: (context, index) {
+                        return GestureDetector(
+                          onTap: () {
+                            _makeMove(index);
+                          },
+                          child: Container(
+                            // Hücrelerin kendisi de Muted Charcoal kart renginde
+                            color: winningLine.contains(index) ? coolGrey.withOpacity(0.9) : mutedCharcoal,
+                            child: Center(
+                              child: AnimatedScale(
+                                scale: board[index] == "" ? 0.0 : 1.0,
+                                duration: const Duration(milliseconds: 300),
+                                curve: Curves.bounceOut,
+                                child: Text(
+                                  board[index],
+                                  style: TextStyle(
+                                    // Sen (X) Neon Coral, AI (O) Electric Teal
+                                    color: board[index] == "X" ? neonCoral : electricTeal, 
+                                    fontSize: 60, 
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+
+          // Zorluk Seçimine Dön Butonu
+          Padding(
+            padding: const EdgeInsets.only(bottom: 20.0), 
+            child: TextButton.icon(
+              onPressed: () {
+                setState(() {
+                  selectedErrorRate = null;
+                  playerScore = 0;
+                  aiScore = 0;
+                  _resetGame();
+                });
+              },
+              icon: Icon(Icons.settings_backup_restore, color: slateGrey),
+              label: Text("Zorluk Seçimine Dön", style: TextStyle(color: slateGrey)),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -385,20 +441,14 @@ Widget _buildGameScreen() {
 
 
   // 2. ADIM: Uygulamanın ana vitrini (Hangi ekranın açılacağını kontrol eder)
-  @override
+@override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[900], 
-      appBar: AppBar(
-        // Zorluk seçilmediyse genel başlık, seçildiyse aktif modu üstte yazar
-        title: Text(selectedErrorRate == null ? 'Tic Tac Toe' : 'Mod: $selectedDifficultyName'),
-        backgroundColor: Colors.teal,
-        centerTitle: true,
+      // İŞTE BURASI: O büyük siyah alanı yok edip, tahta ile ekranı aynı renkte bütünleştiriyoruz
+      backgroundColor: mutedCharcoal, 
+      body: SafeArea(
+        child: selectedErrorRate == null ? _buildSelectionScreen() : _buildGameScreen(),
       ),
-      // Seçim yapıldıysa oyun ekranını, yapılmadıysa zorluk seçme ekranını gösterir
-      body: selectedErrorRate == null 
-          ? _buildSelectionScreen() 
-          : _buildGameScreen(),
     );
   }
 }
