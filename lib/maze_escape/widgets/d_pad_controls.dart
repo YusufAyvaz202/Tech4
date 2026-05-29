@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 class DPadControls extends StatelessWidget {
-  // Butonlara basıldığında çalışacak dışarıdan gelen fonksiyonlar
   final VoidCallback onUp;
   final VoidCallback onDown;
   final VoidCallback onLeft;
@@ -20,8 +19,9 @@ class DPadControls extends StatelessWidget {
       style: ElevatedButton.styleFrom(
         shape: const CircleBorder(),
         padding: const EdgeInsets.all(16),
-        backgroundColor: Colors.blueGrey.shade100,
-        foregroundColor: Colors.black87,
+        backgroundColor: const Color(0xFF1E2640), // Zemin: Muted Charcoal
+        foregroundColor: const Color(0xFF00F5D4), // İkon: Electric Teal
+        elevation: 4, // Hafif bir gölge
       ),
       onPressed: onPressed,
       child: Icon(icon, size: 28),
