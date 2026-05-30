@@ -87,7 +87,9 @@ class _GameScreenState extends State<GameScreen> {
     setState(() { isAiThinking = true; }); 
 
     await Future.delayed(const Duration(milliseconds: 600));
-    AiMove bestMove = ai.getBestMove(board, 5, -99999999, 99999999, true);
+    
+    
+    AiMove bestMove = ai.getBestMove(board, 3, -99999999, 99999999, true);
 
     setState(() { isAiThinking = false; }); 
     
@@ -132,7 +134,6 @@ class _GameScreenState extends State<GameScreen> {
   bool _checkWinner(int player) {
     winPath.clear(); 
 
-    
     for (int r = 0; r < 6; r++) {
       for (int c = 0; c < 4; c++) {
         if (board[r][c] == player && board[r][c + 1] == player && board[r][c + 2] == player && board[r][c + 3] == player) {
@@ -141,7 +142,6 @@ class _GameScreenState extends State<GameScreen> {
         }
       }
     }
-    
     for (int r = 0; r < 3; r++) {
       for (int c = 0; c < 7; c++) {
         if (board[r][c] == player && board[r + 1][c] == player && board[r + 2][c] == player && board[r + 3][c] == player) {
@@ -150,7 +150,6 @@ class _GameScreenState extends State<GameScreen> {
         }
       }
     }
-    
     for (int r = 0; r < 3; r++) {
       for (int c = 0; c < 4; c++) {
         if (board[r][c] == player && board[r + 1][c + 1] == player && board[r + 2][c + 2] == player && board[r + 3][c + 3] == player) {
@@ -159,7 +158,6 @@ class _GameScreenState extends State<GameScreen> {
         }
       }
     }
-   
     for (int r = 3; r < 6; r++) {
       for (int c = 0; c < 4; c++) {
         if (board[r][c] == player && board[r - 1][c + 1] == player && board[r - 2][c + 2] == player && board[r - 3][c + 3] == player) {
@@ -180,7 +178,6 @@ class _GameScreenState extends State<GameScreen> {
     return true; 
   }
 
-  
   int _getEmptyRow(int col) {
     for (int r = 5; r >= 0; r--) {
       if (board[r][col] == 0) return r;
@@ -216,6 +213,13 @@ class _GameScreenState extends State<GameScreen> {
     return Scaffold(
       backgroundColor: bgDeepSlate, 
       appBar: AppBar(
+        leading: IconButton(
+          icon: Icon(Icons.home, color: textOffWhite),
+          onPressed: () {
+           
+          },
+          tooltip: 'Ana Menü',
+        ),
         title: Text(
           'Connect Four',
           style: TextStyle(fontWeight: FontWeight.bold, color: textOffWhite),
