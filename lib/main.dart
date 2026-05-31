@@ -114,7 +114,7 @@ class MainMenuScreen extends StatelessWidget {
                     ),
                     _buildGameCard(
                       context: context,
-                      title: 'Sudoku AI',
+                      title: 'Sudoku',
                       icon: Icons.apps_rounded,
                       color: accentCoral,
                       onTap: () => Navigator.push(
