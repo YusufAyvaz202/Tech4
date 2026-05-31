@@ -106,7 +106,7 @@ class _GameScreenState extends State<GameScreen> {
 
           if (_checkWinner(currentPlayer)) {
             isGameOver = true;
-            String winnerText = currentPlayer == playerColor ? 'Tebrikler, Kazandın!' : 'Yapay Zeka Kazandı!';
+            String winnerText = currentPlayer == playerColor ? 'Congratulations, You Win!' : 'AI Win!';
             Color winnerColor = currentPlayer == 1 ? p1Coral : p2Teal;
             
             Future.delayed(const Duration(milliseconds: 800), () {
@@ -116,7 +116,7 @@ class _GameScreenState extends State<GameScreen> {
           } else if (_checkDraw()) {
             isGameOver = true;
             Future.delayed(const Duration(milliseconds: 800), () {
-              _showGameOverDialog('Oyun Berabere!', textOffWhite);
+              _showGameOverDialog('Draw!', textOffWhite);
             });
           } else {
             currentPlayer = currentPlayer == 1 ? 2 : 1;
@@ -193,14 +193,14 @@ class _GameScreenState extends State<GameScreen> {
         return AlertDialog(
           backgroundColor: boardCharcoal,
           title: Text(title, style: TextStyle(color: color, fontWeight: FontWeight.bold)),
-          content: Text('Yeni bir oyun başlatmak ister misin?', style: TextStyle(color: textSlate)),
+          content: Text('Would you like to start a new game?', style: TextStyle(color: textSlate)),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop(); 
                 _resetGame(); 
               },
-              child: Text('Tekrar Oyna', style: TextStyle(color: textOffWhite)),
+              child: Text('Play Again', style: TextStyle(color: textOffWhite)),
             ),
           ],
         );
@@ -218,7 +218,7 @@ class _GameScreenState extends State<GameScreen> {
           onPressed: () {
            Navigator.of(context).popUntil((route) => route.isFirst);
           },
-          tooltip: 'Ana Menü',
+          tooltip: 'Main Menu',
         ),
         title: Text(
           'Connect Four',
@@ -237,13 +237,13 @@ class _GameScreenState extends State<GameScreen> {
                   hintColumns = ai.getTopTwoMoves(board);
                 });
               },
-              tooltip: 'İpucu Al',
+              tooltip: 'Get Hint',
             ),
           if (playerColor != null)
             IconButton(
               icon: Icon(Icons.refresh, color: textSlate),
               onPressed: _resetGame,
-              tooltip: 'Oyunu Sıfırla',
+              tooltip: 'Reset the Game',
             ),
         ],
       ),
@@ -257,7 +257,7 @@ class _GameScreenState extends State<GameScreen> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
-            'Tarafını Seç',
+            'Choose a Side',
             style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: textOffWhite),
           ),
           const SizedBox(height: 50),
@@ -308,7 +308,7 @@ class _GameScreenState extends State<GameScreen> {
           Padding(
             padding: const EdgeInsets.only(bottom: 24.0),
             child: Text(
-              currentPlayer == playerColor ? 'Senin Sıran' : 'Yapay Zeka Düşünüyor...',
+              currentPlayer == playerColor ? 'Your Turn' : 'AI is Thinking...',
               style: TextStyle(
                 fontSize: 22, 
                 fontWeight: FontWeight.w600,

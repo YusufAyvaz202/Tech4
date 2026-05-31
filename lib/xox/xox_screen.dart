@@ -136,12 +136,12 @@ void _showGameOverDialog(String winner) {
     // Hem skoru artırıyoruz hem de mesajı tek bir yerde belirliyoruz
     setState(() {
       if (winner == "Draw") {
-        title = "Berabere!";
+        title = "Draw!";
       } else if (winner == "X") {
-        title = "Sen Kazandın!";
+        title = "You Win!";
         playerScore++;
       } else if (winner == "O") {
-        title = "AI Kazandı!";
+        title = "AI Win!";
         aiScore++;
       }
       
@@ -158,14 +158,14 @@ void _showGameOverDialog(String winner) {
         return AlertDialog(
           backgroundColor: Colors.grey[800],
           title: Text(title, style: const TextStyle(color: Colors.white)),
-          content: const Text("Tekrar oynamak ister misin?", style: TextStyle(color: Colors.white70)),
+          content: const Text("Would you like to play again?", style: TextStyle(color: Colors.white70)),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop(); // Diyalog penceresini kapat
                 _resetGame(); // Oyunu sıfırla
               },
-              child: const Text("Yeniden Başlat", style: TextStyle(color: Colors.tealAccent)),
+              child: const Text("Restart", style: TextStyle(color: Colors.tealAccent)),
             ),
           ],
         );
@@ -186,27 +186,27 @@ Widget _buildSelectionScreen() {
         const SizedBox(height: 30),
 
         Text(
-          "YAPAY ZEKA vs SEN",
+          "AI vs YOU",
           style: TextStyle(color: offWhite, fontSize: 32, fontWeight: FontWeight.bold, letterSpacing: 1.5),
         ),
         const SizedBox(height: 10),
         Text(
-          "Kendi sınırlarını test et",
+          "Test your limits",
           style: TextStyle(color: slateGrey, fontSize: 16, fontStyle: FontStyle.italic),
         ),
         
         const SizedBox(height: 60),
 
         Text(
-          "Zorluk Seviyesi Seç",
+          "Select Difficulty Level",
           style: TextStyle(color: offWhite, fontSize: 22, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 20),
         
         // Buton renklerini yeni temamıza uyarladık
-        _difficultyButton("KOLAY", 60, electricTeal),
-        _difficultyButton("ZOR", 30, slateGrey),
-        _difficultyButton("İMKANSIZ", 0, neonCoral),
+        _difficultyButton("EASY", 60, electricTeal),
+        _difficultyButton("HARD", 30, slateGrey),
+        _difficultyButton("IMPOSSIBLE", 0, neonCoral),
         
         const SizedBox(height: 40),
         
@@ -215,7 +215,7 @@ Widget _buildSelectionScreen() {
             Navigator.of(context).popUntil((route) => route.isFirst);
            },
           icon: Icon(Icons.arrow_back, color: slateGrey),
-          label: Text("Ana Menüye Dön", style: TextStyle(color: slateGrey)),
+          label: Text("Back to Main Menu", style: TextStyle(color: slateGrey)),
         ),
         const SizedBox(height: 20),
       ],
@@ -251,9 +251,9 @@ Widget _difficultyButton(String name, int rate, Color color) {
 
 
 Widget _buildGameScreen() {
-    Color modeColor = selectedDifficultyName == "İMKANSIZ" 
+    Color modeColor = selectedDifficultyName == "IMPOSSIBLE" 
         ? neonCoral 
-        : (selectedDifficultyName == "KOLAY" ? electricTeal : slateGrey);
+        : (selectedDifficultyName == "EASY" ? electricTeal : slateGrey);
         
     return SizedBox(
       width: double.infinity, // Sütunun ekranın %100 genişliğini kaplamasını zorunlu kılar
@@ -322,7 +322,7 @@ Widget _buildGameScreen() {
                   mainAxisSize: MainAxisSize.min,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text("SEN", style: TextStyle(color: neonCoral, fontSize: 16, fontWeight: FontWeight.bold)),
+                    Text("YOU", style: TextStyle(color: neonCoral, fontSize: 16, fontWeight: FontWeight.bold)),
                     const SizedBox(width: 50), // İsimlerin aralığı
                     Text("AI", style: TextStyle(color: electricTeal, fontSize: 16, fontWeight: FontWeight.bold)),
                   ],
@@ -349,7 +349,7 @@ Widget _buildGameScreen() {
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: Text(
-              isPlayerTurn ? "Sıra: Sen" : "Sıra: AI",
+              isPlayerTurn ? "It's Your Turn": "It's AI's Turn",
               style: TextStyle(color: offWhite, fontSize: 24, fontWeight: FontWeight.bold),
             ),
           ),
@@ -431,7 +431,7 @@ Widget _buildGameScreen() {
                 });
               },
               icon: Icon(Icons.settings_backup_restore, color: slateGrey),
-              label: Text("Zorluk Seçimine Dön", style: TextStyle(color: slateGrey)),
+              label: Text("Back to Difficulty Selection", style: TextStyle(color: slateGrey)),
             ),
           ),
         ],

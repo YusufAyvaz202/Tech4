@@ -55,7 +55,7 @@ class GameScreen extends StatelessWidget {
                           final seconds = (timeInSeconds % 60).toString().padLeft(2, '0');
                           
                           return Text(
-                            "Süre: $minutes:$seconds",
+                            "Time: $minutes:$seconds",
                             style: const TextStyle(
                               fontSize: 20, 
                               fontWeight: FontWeight.bold,
@@ -68,7 +68,7 @@ class GameScreen extends StatelessWidget {
                         selector: (_, provider) => provider.mistakes,
                         builder: (context, mistakes, child) {
                           return Text(
-                            "Hatalar: $mistakes/3",
+                            "Mistakes: $mistakes/3",
                             style: TextStyle(
                               fontSize: 20, 
                               fontWeight: FontWeight.bold,
@@ -149,7 +149,7 @@ class GameScreen extends StatelessWidget {
       builder: (dialogContext) => AlertDialog(
         backgroundColor: const Color(0xFF1E2640), // Muted Charcoal
         title: Text(
-          isWon ? 'Tebrikler! 🎉' : 'Oyun Bitti ❌',
+          isWon ? 'Congratulations! 🎉' : 'Game Over ❌',
           style: TextStyle(
             fontWeight: FontWeight.bold,
             color: isWon ? const Color(0xFF00F5D4) : const Color(0xFFFF6B6B),
@@ -157,8 +157,8 @@ class GameScreen extends StatelessWidget {
         ),
         content: Text(
           isWon 
-              ? 'Sudoku bulmacasını başarıyla çözdünüz!' 
-              : '3 hata yaptığınız için oyunu kaybettiniz.',
+              ? 'You have successfully solved the Sudoku puzzle!' 
+              : 'You lost the game because you made 3 mistakes.',
           style: const TextStyle(fontSize: 16, color: Color(0xFFF8FAFC)),
         ),
         actions: [
@@ -166,7 +166,7 @@ class GameScreen extends StatelessWidget {
             onPressed: () {
               Navigator.of(context).popUntil((route) => route.isFirst);
             },
-            child: const Text('Ana Menü', style: TextStyle(color: Color(0xFF94A3B8))),
+            child: const Text('Main Menu', style: TextStyle(color: Color(0xFF94A3B8))),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
@@ -181,7 +181,7 @@ class GameScreen extends StatelessWidget {
                 context.read<GameProvider>().loadPuzzle();
               }
             },
-            child: Text(isWon ? 'Sonraki Seviye' : 'Tekrar Dene'),
+            child: Text(isWon ? 'Next Level': 'Try Again'),
           ),
         ],
       ),

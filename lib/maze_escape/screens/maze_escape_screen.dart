@@ -43,7 +43,7 @@ class _MazeEscapeScreenState extends State<MazeEscapeScreen> {
           children: [
             Icon(Icons.emoji_events, color: Color(0xFFFF6B6B), size: 32), // Neon Coral Kupa
             SizedBox(width: 8),
-            Text('Tebrikler!', style: TextStyle(color: Color(0xFFF8FAFC))), // Off-White
+            Text('Congratulations!', style: TextStyle(color: Color(0xFFF8FAFC))), // Off-White
           ],
         ),
         content: Column(
@@ -51,7 +51,7 @@ class _MazeEscapeScreenState extends State<MazeEscapeScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Labirenti ${_controller.currentSteps} adımda başarıyla tamamladın!',
+              'You successfully completed the maze in ${_controller.currentSteps} steps!',
               style: const TextStyle(fontSize: 16, color: Color(0xFF94A3B8)), // Slate Grey
             ),
             const SizedBox(height: 16), 
@@ -68,7 +68,7 @@ class _MazeEscapeScreenState extends State<MazeEscapeScreen> {
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      'A* Kusursuz Çözümü: ${_controller.optimalSteps} adım',
+                      'A* The Perfect Solution: ${_controller.optimalSteps} steps',
                       style: const TextStyle(
                         fontSize: 14, 
                         fontWeight: FontWeight.bold, 
@@ -87,7 +87,7 @@ class _MazeEscapeScreenState extends State<MazeEscapeScreen> {
               Navigator.of(context).pop(); 
               _controller.loadNextMaze(); 
             },
-            child: const Text('Sonraki Bölüm', style: TextStyle(fontSize: 16, color: Color(0xFF00F5D4))),
+            child: const Text('Next Level', style: TextStyle(fontSize: 16, color: Color(0xFF00F5D4))),
           ),
         ],
       ),
@@ -101,18 +101,18 @@ class _MazeEscapeScreenState extends State<MazeEscapeScreen> {
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.home, color: Color(0xFFF8FAFC)), // Off-White
-          tooltip: 'Ana Menüye Dön',
+          tooltip: 'Back to Main Menu',
           onPressed: () {
             Navigator.of(context).popUntil((route) => route.isFirst);
           },
         ),
-        title: const Text('Labirent Kaçış', style: TextStyle(color: Color(0xFFF8FAFC))),
+        title: const Text('Maze Escape', style: TextStyle(color: Color(0xFFF8FAFC))),
         backgroundColor: const Color(0xFF1E2640), // Muted Charcoal
         elevation: 0,
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh, color: Color(0xFFF8FAFC)),
-            tooltip: 'Farklı Labirent Yükle',
+            tooltip: 'Load a Different Maze',
             onPressed: () {
               _controller.loadNextMaze();
             },
@@ -131,11 +131,11 @@ class _MazeEscapeScreenState extends State<MazeEscapeScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'Seviye ${_controller.currentMazeIndex + 1}',
+                      'Level ${_controller.currentMazeIndex + 1}',
                       style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFFF8FAFC)), // Off-White
                     ),
                     Text(
-                      'Adım: ${_controller.currentSteps}',
+                      'Steps: ${_controller.currentSteps}',
                       style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFF00F5D4)), // Electric Teal
                     ),
                   ],
