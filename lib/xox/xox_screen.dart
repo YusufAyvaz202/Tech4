@@ -174,51 +174,53 @@ void _showGameOverDialog(String winner) {
   }
 
 Widget _buildSelectionScreen() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: [
-        const SizedBox(height: 50),
-        
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 40.0),
-          child: Image.asset('assets/images/xox_logoo.png', height: 180, fit: BoxFit.contain),
-        ),
-        const SizedBox(height: 30),
-
-        Text(
-          "AI vs YOU",
-          style: TextStyle(color: offWhite, fontSize: 32, fontWeight: FontWeight.bold, letterSpacing: 1.5),
-        ),
-        const SizedBox(height: 10),
-        Text(
-          "Test your limits",
-          style: TextStyle(color: slateGrey, fontSize: 16, fontStyle: FontStyle.italic),
-        ),
-        
-        const SizedBox(height: 60),
-
-        Text(
-          "Select Difficulty Level",
-          style: TextStyle(color: offWhite, fontSize: 22, fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(height: 20),
-        
-        // Buton renklerini yeni temamıza uyarladık
-        _difficultyButton("EASY", 60, electricTeal),
-        _difficultyButton("HARD", 30, slateGrey),
-        _difficultyButton("IMPOSSIBLE", 0, neonCoral),
-        
-        const SizedBox(height: 40),
-        
-        TextButton.icon(
-          onPressed: () { 
-            Navigator.of(context).popUntil((route) => route.isFirst);
-           },
-          icon: Icon(Icons.arrow_back, color: slateGrey),
-          label: Text("Back to Main Menu", style: TextStyle(color: slateGrey)),
-        ),
-        const SizedBox(height: 20),
-      ],
+    return SingleChildScrollView(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          const SizedBox(height: 50),
+          
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 40.0),
+            child: Image.asset('assets/images/xox_logoo.png', height: 180, fit: BoxFit.contain),
+          ),
+          const SizedBox(height: 30),
+      
+          Text(
+            "AI vs YOU",
+            style: TextStyle(color: offWhite, fontSize: 32, fontWeight: FontWeight.bold, letterSpacing: 1.5),
+          ),
+          const SizedBox(height: 10),
+          Text(
+            "Test your limits",
+            style: TextStyle(color: slateGrey, fontSize: 16, fontStyle: FontStyle.italic),
+          ),
+          
+          const SizedBox(height: 60),
+      
+          Text(
+            "Select Difficulty Level",
+            style: TextStyle(color: offWhite, fontSize: 22, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 20),
+          
+          // Buton renklerini yeni temamıza uyarladık
+          _difficultyButton("EASY", 60, electricTeal),
+          _difficultyButton("HARD", 30, slateGrey),
+          _difficultyButton("IMPOSSIBLE", 0, neonCoral),
+          
+          const SizedBox(height: 40),
+          
+          TextButton.icon(
+            onPressed: () { 
+              Navigator.of(context).popUntil((route) => route.isFirst);
+             },
+            icon: Icon(Icons.arrow_back, color: slateGrey),
+            label: Text("Back to Main Menu", style: TextStyle(color: slateGrey)),
+          ),
+          const SizedBox(height: 20),
+        ],
+      ),
     );
   }
 
