@@ -7,12 +7,12 @@ class DPadControls extends StatelessWidget {
   final VoidCallback onRight;
 
   const DPadControls({
-    Key? key,
+    super.key,
     required this.onUp,
     required this.onDown,
     required this.onLeft,
     required this.onRight,
-  }) : super(key: key);
+  });
 
   Widget _buildButton(IconData icon, VoidCallback onPressed) {
     return ElevatedButton(

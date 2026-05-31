@@ -3,7 +3,7 @@ import 'minimax_ai.dart';
 
 // Bu sınıf senin oyununun ana vitrinidir.
 class TicTacToeScreen extends StatefulWidget {
-  const TicTacToeScreen({Key? key}) : super(key: key);
+  const TicTacToeScreen({super.key});
 
   @override
   State<TicTacToeScreen> createState() => _TicTacToeScreenState();
@@ -211,7 +211,9 @@ Widget _buildSelectionScreen() {
         const SizedBox(height: 40),
         
         TextButton.icon(
-          onPressed: () { /* Navigator.pop(context); */ },
+          onPressed: () { 
+            Navigator.of(context).popUntil((route) => route.isFirst);
+           },
           icon: Icon(Icons.arrow_back, color: slateGrey),
           label: Text("Ana Menüye Dön", style: TextStyle(color: slateGrey)),
         ),

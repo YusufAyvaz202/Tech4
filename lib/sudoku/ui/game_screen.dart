@@ -28,7 +28,7 @@ class GameScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xFF121826), // Deep Slate
       appBar: AppBar(
-        title: const Text('Sudoku AI'),
+        title: const Text('Sudoku'),
         centerTitle: true,
         backgroundColor: const Color(0xFF121826),
         foregroundColor: const Color(0xFFF8FAFC), // Off-White
@@ -164,7 +164,7 @@ class GameScreen extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () {
-              // Main Menu action is left empty for now
+              Navigator.of(context).popUntil((route) => route.isFirst);
             },
             child: const Text('Ana Menü', style: TextStyle(color: Color(0xFF94A3B8))),
           ),

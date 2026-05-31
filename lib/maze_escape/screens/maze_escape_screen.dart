@@ -4,7 +4,7 @@ import '../widgets/maze_grid_board.dart';
 import '../widgets/d_pad_controls.dart';
 
 class MazeEscapeScreen extends StatefulWidget {
-  const MazeEscapeScreen({Key? key}) : super(key: key);
+  const MazeEscapeScreen({super.key});
 
   @override
   State<MazeEscapeScreen> createState() => _MazeEscapeScreenState();
@@ -103,13 +103,7 @@ class _MazeEscapeScreenState extends State<MazeEscapeScreen> {
           icon: const Icon(Icons.home, color: Color(0xFFF8FAFC)), // Off-White
           tooltip: 'Ana Menüye Dön',
           onPressed: () {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                backgroundColor: const Color(0xFF1E2640),
-                content: const Text('Ana Menü modülü henüz entegre edilmedi.', style: TextStyle(color: Color(0xFFF8FAFC))),
-                duration: const Duration(seconds: 2),
-              ),
-            );
+            Navigator.of(context).popUntil((route) => route.isFirst);
           },
         ),
         title: const Text('Labirent Kaçış', style: TextStyle(color: Color(0xFFF8FAFC))),

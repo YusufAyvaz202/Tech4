@@ -57,10 +57,6 @@ flutter:
   uses-material-design: true
   assets:
     - assets/puzzles.json # JSON verilerimizi tutacağımız dosya
-
-  # assets kelimesinden önce tam 2 kez boşluk (space) tuşuna basılmış olmalı
-  assets:
-    # Bu tireden (-) önce tam 4 kez boşluk (space) tuşuna basılmış olmalı
     - assets/images/xox_logoo.png
 
 

@@ -5,10 +5,10 @@ class MazeGridBoard extends StatelessWidget {
   final List<List<int>> hintPath; 
 
   const MazeGridBoard({
-    Key? key, 
+    super.key, 
     required this.maze,
     required this.hintPath, 
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

@@ -52,7 +52,7 @@ class AStarPathfinder {
 
         if (newR < 0 || newR >= maze.length || newC < 0 || newC >= maze[0].length) continue;
         if (maze[newR][newC] == 1) continue;
-        if (closedList.contains("${newR}_${newC}")) continue;
+        if (closedList.contains("${newR}_$newC")) continue;
 
         int tentativeG = current.g + 1; 
         int existingIndex = openList.indexWhere((n) => n.row == newR && n.col == newC);

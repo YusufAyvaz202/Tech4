@@ -21,13 +21,11 @@ Random random = Random();
   
   // BURASI KRİTİK: errorRate artık dışarıdan (arayüzden) geliyor.
   if (chance < errorRate) {
-    print("AI Hata Yaptı! (Zorluk: %$errorRate hata payı)");
     int randomIndex = random.nextInt(availableMoves.length);
     return availableMoves[randomIndex];
   }
 
     // --- %70 İHTİMALLE: MİNİMAX İLE KUSURSUZ HAMLE ---
-    print("AI Düşünüyor... (Minimax Devrede)");
     int bestScore = -10000;
     int bestMove = -1;
 

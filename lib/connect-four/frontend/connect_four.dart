@@ -216,7 +216,7 @@ class _GameScreenState extends State<GameScreen> {
         leading: IconButton(
           icon: Icon(Icons.home, color: textOffWhite),
           onPressed: () {
-           
+           Navigator.of(context).popUntil((route) => route.isFirst);
           },
           tooltip: 'Ana Menü',
         ),
