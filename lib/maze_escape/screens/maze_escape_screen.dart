@@ -174,7 +174,7 @@ class _MazeEscapeScreenState extends State<MazeEscapeScreen> {
                     ),
                     icon: const Icon(Icons.lightbulb_outline),
                     label: const Text(
-                      'İpucu Ver',
+                      'Get Hint',
                       style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     ),
                     onPressed: () {
