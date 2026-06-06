@@ -5,7 +5,7 @@ import 'package:provider/provider.dart';
 import 'xox/xox_screen.dart';
 import 'maze_escape/screens/maze_escape_screen.dart';
 // Using aliases for screens with the same name to avoid conflicts
-import 'connect-four/frontend/connect_four.dart' as c4; 
+import 'connect-four/connect_four.dart' as c4; 
 import 'sudoku/ui/game_screen.dart' as sudoku;
 import 'sudoku/logic/game_provider.dart';
 

@@ -1,25 +1,8 @@
 import 'package:flutter/material.dart';
-import '../AI/minimax_ai.dart'; 
-
-void main() {
-  runApp(const ConnectFourApp());
-}
-
-class ConnectFourApp extends StatelessWidget {
-  const ConnectFourApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Connect Four',
-      theme: ThemeData(
-        fontFamily: 'Roboto', 
-      ),
-      home: const GameScreen(),
-    );
-  }
-}
+import '../constants/app_colors.dart';
+import '../ai/minimax_ai.dart';
+import '../models/ai_move.dart';
+import '../widgets/animated_piece.dart';
 
 class GameScreen extends StatefulWidget {
   const GameScreen({super.key});
@@ -29,14 +12,6 @@ class GameScreen extends StatefulWidget {
 }
 
 class _GameScreenState extends State<GameScreen> {
-  final Color bgDeepSlate = const Color(0xFF121826);
-  final Color boardCharcoal = const Color(0xFF1E2640);
-  final Color gridGrey = const Color(0xFF3A4454);
-  final Color p1Coral = const Color(0xFFFF6B6B);
-  final Color p2Teal = const Color(0xFF00F5D4);
-  final Color textOffWhite = const Color(0xFFF8FAFC);
-  final Color textSlate = const Color(0xFF94A3B8);
-
   List<List<int>> board = List.generate(6, (_) => List.generate(7, (_) => 0));
   
   int currentPlayer = 1; 
@@ -88,7 +63,6 @@ class _GameScreenState extends State<GameScreen> {
 
     await Future.delayed(const Duration(milliseconds: 600));
     
-    
     AiMove bestMove = ai.getBestMove(board, 3, -99999999, 99999999, true);
 
     setState(() { isAiThinking = false; }); 
@@ -107,7 +81,7 @@ class _GameScreenState extends State<GameScreen> {
           if (_checkWinner(currentPlayer)) {
             isGameOver = true;
             String winnerText = currentPlayer == playerColor ? 'Congratulations, You Win!' : 'AI Win!';
-            Color winnerColor = currentPlayer == 1 ? p1Coral : p2Teal;
+            Color winnerColor = currentPlayer == 1 ? AppColors.p1Coral : AppColors.p2Teal;
             
             Future.delayed(const Duration(milliseconds: 800), () {
               _showGameOverDialog(winnerText, winnerColor);
@@ -116,7 +90,7 @@ class _GameScreenState extends State<GameScreen> {
           } else if (_checkDraw()) {
             isGameOver = true;
             Future.delayed(const Duration(milliseconds: 800), () {
-              _showGameOverDialog('Draw!', textOffWhite);
+              _showGameOverDialog('Draw!', AppColors.textOffWhite);
             });
           } else {
             currentPlayer = currentPlayer == 1 ? 2 : 1;
@@ -191,16 +165,16 @@ class _GameScreenState extends State<GameScreen> {
       barrierDismissible: false, 
       builder: (context) {
         return AlertDialog(
-          backgroundColor: boardCharcoal,
+          backgroundColor: AppColors.boardCharcoal,
           title: Text(title, style: TextStyle(color: color, fontWeight: FontWeight.bold)),
-          content: Text('Would you like to start a new game?', style: TextStyle(color: textSlate)),
+          content: Text('Would you like to start a new game?', style: TextStyle(color: AppColors.textSlate)),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop(); 
                 _resetGame(); 
               },
-              child: Text('Play Again', style: TextStyle(color: textOffWhite)),
+              child: Text('Play Again', style: TextStyle(color: AppColors.textOffWhite)),
             ),
           ],
         );
@@ -211,10 +185,10 @@ class _GameScreenState extends State<GameScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: bgDeepSlate, 
+      backgroundColor: AppColors.bgDeepSlate, 
       appBar: AppBar(
         leading: IconButton(
-          icon: Icon(Icons.home, color: textOffWhite),
+          icon: Icon(Icons.home, color: AppColors.textOffWhite),
           onPressed: () {
            Navigator.of(context).popUntil((route) => route.isFirst);
           },
@@ -222,9 +196,9 @@ class _GameScreenState extends State<GameScreen> {
         ),
         title: Text(
           'Connect Four',
-          style: TextStyle(fontWeight: FontWeight.bold, color: textOffWhite),
+          style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textOffWhite),
         ),
-        backgroundColor: bgDeepSlate,
+        backgroundColor: AppColors.bgDeepSlate,
         elevation: 0, 
         centerTitle: true,
         actions: [
@@ -241,7 +215,7 @@ class _GameScreenState extends State<GameScreen> {
             ),
           if (playerColor != null)
             IconButton(
-              icon: Icon(Icons.refresh, color: textSlate),
+              icon: Icon(Icons.refresh, color: AppColors.textSlate),
               onPressed: _resetGame,
               tooltip: 'Reset the Game',
             ),
@@ -258,7 +232,7 @@ class _GameScreenState extends State<GameScreen> {
         children: [
           Text(
             'Choose a Side',
-            style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: textOffWhite),
+            style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: AppColors.textOffWhite),
           ),
           const SizedBox(height: 50),
           Row(
@@ -270,10 +244,10 @@ class _GameScreenState extends State<GameScreen> {
                   width: 100,
                   height: 100,
                   decoration: BoxDecoration(
-                    color: p1Coral,
+                    color: AppColors.p1Coral,
                     shape: BoxShape.circle,
                     boxShadow: [
-                      BoxShadow(color: p1Coral.withOpacity(0.5), blurRadius: 15, spreadRadius: 2)
+                      BoxShadow(color: AppColors.p1Coral.withOpacity(0.5), blurRadius: 15, spreadRadius: 2)
                     ],
                   ),
                 ),
@@ -285,10 +259,10 @@ class _GameScreenState extends State<GameScreen> {
                   width: 100,
                   height: 100,
                   decoration: BoxDecoration(
-                    color: p2Teal,
+                    color: AppColors.p2Teal,
                     shape: BoxShape.circle,
                     boxShadow: [
-                      BoxShadow(color: p2Teal.withOpacity(0.5), blurRadius: 15, spreadRadius: 2)
+                      BoxShadow(color: AppColors.p2Teal.withOpacity(0.5), blurRadius: 15, spreadRadius: 2)
                     ],
                   ),
                 ),
@@ -312,7 +286,7 @@ class _GameScreenState extends State<GameScreen> {
               style: TextStyle(
                 fontSize: 22, 
                 fontWeight: FontWeight.w600,
-                color: currentPlayer == 1 ? p1Coral : p2Teal,
+                color: currentPlayer == 1 ? AppColors.p1Coral : AppColors.p2Teal,
               ),
             ),
           ),
@@ -326,8 +300,8 @@ class _GameScreenState extends State<GameScreen> {
                   height: 656,
                   padding: const EdgeInsets.all(8.0),
                   decoration: BoxDecoration(
-                    color: boardCharcoal, 
-                    border: Border.all(color: gridGrey, width: 2), 
+                    color: AppColors.boardCharcoal, 
+                    border: Border.all(color: AppColors.gridGrey, width: 2), 
                     borderRadius: BorderRadius.circular(16.0),
                     boxShadow: const [
                       BoxShadow(color: Colors.black45, blurRadius: 15, offset: Offset(0, 8))
@@ -356,10 +330,10 @@ class _GameScreenState extends State<GameScreen> {
                         child: cellValue == 0
                             ? Container(
                                 decoration: BoxDecoration(
-                                  color: bgDeepSlate, 
+                                  color: AppColors.bgDeepSlate, 
                                   shape: BoxShape.circle,
                                   border: Border.all(
-                                    color: isHinted ? Colors.yellowAccent : gridGrey.withOpacity(0.3), 
+                                    color: isHinted ? Colors.yellowAccent : AppColors.gridGrey.withOpacity(0.3), 
                                     width: isHinted ? 3 : 1
                                   ),
                                   boxShadow: isHinted 
@@ -374,9 +348,9 @@ class _GameScreenState extends State<GameScreen> {
                                 player: cellValue, 
                                 row: row, 
                                 isWinningPiece: isWinningPiece,
-                                colorP1: p1Coral,
-                                colorP2: p2Teal,
-                                glowColor: textOffWhite,
+                                colorP1: AppColors.p1Coral,
+                                colorP2: AppColors.p2Teal,
+                                glowColor: AppColors.textOffWhite,
                               ),
                       );
                     },
@@ -386,71 +360,6 @@ class _GameScreenState extends State<GameScreen> {
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class AnimatedPiece extends StatelessWidget {
-  final int player;
-  final int row; 
-  final bool isWinningPiece;
-  final Color colorP1;
-  final Color colorP2;
-  final Color glowColor;
-
-  const AnimatedPiece({
-    super.key, 
-    required this.player, 
-    required this.row,
-    required this.isWinningPiece,
-    required this.colorP1,
-    required this.colorP2,
-    required this.glowColor,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    Color pieceColor = player == 1 ? colorP1 : colorP2;
-
-    return TweenAnimationBuilder<Offset>(
-      duration: Duration(milliseconds: 400 + (row * 80)), 
-      curve: Curves.bounceOut, 
-      tween: Tween<Offset>(
-        begin: Offset(0, -(row + 2).toDouble()), 
-        end: Offset.zero, 
-      ),
-      builder: (context, offset, child) {
-        return FractionalTranslation(
-          translation: offset,
-          child: child,
-        );
-      },
-      child: Container(
-        decoration: BoxDecoration(
-          color: pieceColor,
-          shape: BoxShape.circle,
-          boxShadow: isWinningPiece 
-              ? [
-                  BoxShadow(
-                    color: glowColor.withOpacity(0.8),
-                    blurRadius: 20,
-                    spreadRadius: 4,
-                  ),
-                  BoxShadow(
-                    color: pieceColor, 
-                    blurRadius: 10,
-                    spreadRadius: 1,
-                  )
-                ]
-              : [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.3),
-                    blurRadius: 4,
-                    offset: const Offset(0, 3),
-                  )
-                ],
-        ),
       ),
     );
   }
